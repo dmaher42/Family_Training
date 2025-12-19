@@ -217,17 +217,57 @@
         });
       }
 
+      function normalizeWeeks(plan) {
+        if (Array.isArray(plan.weeks)) {
+          return plan.weeks;
+        }
+
+        if (Array.isArray(plan.days)) {
+          return [
+            {
+              title: plan.title || "Week 1",
+              days: plan.days,
+            },
+          ];
+        }
+
+        if (plan.days && typeof plan.days === "object") {
+          return [
+            {
+              title: plan.title || "Week 1",
+              days: Object.values(plan.days),
+            },
+          ];
+        }
+
+        return [];
+      }
+
+      function renderBlockItems(listEl, items = []) {
+        items.forEach((item) => {
+          const li = document.createElement("li");
+          if (typeof item === "string") {
+            li.textContent = item;
+          } else if (item && typeof item === "object") {
+            li.textContent = item.text || item.ref || item.listRef || "";
+          }
+          if (li.textContent) {
+            listEl.append(li);
+          }
+        });
+      }
+
       function renderPlan() {
         if (!currentPlan) return;
 
-        planTitle.textContent = currentPlan.meta.name;
-        planSubtitle.textContent = currentPlan.meta.subtitle || "";
-        planSubtitle.style.display = currentPlan.meta.subtitle ? "block" : "none";
+        planTitle.textContent = currentPlan.meta?.name || "";
+        planSubtitle.textContent = currentPlan.meta?.subtitle || "";
+        planSubtitle.style.display = currentPlan.meta?.subtitle ? "block" : "none";
         planOverview.textContent = currentPlan.overview || "";
         planOverview.style.display = currentPlan.overview ? "block" : "none";
 
         weeksContainer.innerHTML = "";
-        const weeks = currentPlan.weeks || [];
+        const weeks = normalizeWeeks(currentPlan);
 
         weeks.forEach((week, idx) => {
           const weekCard = document.createElement("article");
@@ -248,9 +288,17 @@
 
             const nameEl = document.createElement("p");
             nameEl.className = "day-name";
-            nameEl.textContent = day.name || "Session";
+            nameEl.textContent = day.name || day.day || "Session";
 
             header.append(nameEl);
+
+            if (day.tag || day.tagTemplate) {
+              const tagEl = document.createElement("span");
+              tagEl.className = "muted";
+              tagEl.textContent = day.tag || day.tagTemplate;
+              header.append(tagEl);
+            }
+
             dayEl.append(header);
 
             if (day.focus) {
@@ -261,13 +309,33 @@
             }
 
             if (Array.isArray(day.blocks) && day.blocks.length) {
-              const list = document.createElement("ul");
-              day.blocks.forEach((item) => {
-                const li = document.createElement("li");
-                li.textContent = item;
-                list.append(li);
+              day.blocks.forEach((block) => {
+                if (typeof block === "string") {
+                  const list = document.createElement("ul");
+                  const li = document.createElement("li");
+                  li.textContent = block;
+                  list.append(li);
+                  dayEl.append(list);
+                  return;
+                }
+
+                if (block && typeof block === "object") {
+                  const list = document.createElement("ul");
+                  renderBlockItems(list, block.items);
+
+                  const hasContent = list.children.length > 0;
+                  if (block.title && hasContent) {
+                    const titleEl = document.createElement("p");
+                    titleEl.className = "day-name";
+                    titleEl.textContent = block.title;
+                    dayEl.append(titleEl);
+                  }
+
+                  if (hasContent) {
+                    dayEl.append(list);
+                  }
+                }
               });
-              dayEl.append(list);
             }
 
             weekCard.append(dayEl);
