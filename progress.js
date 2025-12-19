@@ -1,8 +1,10 @@
 const COMPLETED_DAYS_KEY = "completed_days_v1";
 const SKIPPED_DAYS_KEY = "skipped_days_v1";
 const WEEK_STATUS_KEY = "weekly_status_v1";
+const PROGRESS_KEY = "progress_v1";
 
 const buildKey = (baseKey, planId) => `${baseKey}:${planId}`;
+const buildProgressKey = (planId, weekId) => `${PROGRESS_KEY}:${planId}:${weekId}`;
 
 const readJson = (key) => {
   const stored = localStorage.getItem(key);
@@ -35,4 +37,12 @@ export function loadWeeklyStatus(planId) {
 
 export function saveWeeklyStatus(planId, status) {
   writeJson(buildKey(WEEK_STATUS_KEY, planId), status);
+}
+
+export function loadProgress(planId, weekId) {
+  return readJson(buildProgressKey(planId, weekId)) || { completed: [], skipped: [] };
+}
+
+export function saveProgress(planId, weekId, progress) {
+  writeJson(buildProgressKey(planId, weekId), progress);
 }
