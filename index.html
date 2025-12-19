@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Family Training Hub</title>
+    <link rel="stylesheet" href="./themes.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--fg);
+      }
+
+      main {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px 16px 48px;
+      }
+
+      .top-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .title {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .muted {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 14px;
+      }
+
+      select {
+        padding: 8px 10px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--card);
+        color: var(--fg);
+        font-size: 14px;
+      }
+
+      .toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      .plan-header {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+        margin-bottom: 20px;
+      }
+
+      .plan-title {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      .plan-subtitle {
+        margin: 6px 0 0;
+        color: var(--muted);
+      }
+
+      .weeks {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+      }
+
+      .week {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 14px;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+      }
+
+      .week h3 {
+        margin: 0 0 12px;
+        font-size: 18px;
+      }
+
+      .day {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+      }
+
+      .day:last-child {
+        margin-bottom: 0;
+      }
+
+      .day-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .day-name {
+        margin: 0;
+        font-weight: 700;
+      }
+
+      .day-focus {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      ul {
+        margin: 8px 0 0 18px;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="top-bar">
+        <div>
+          <p class="muted">Family Training Hub</p>
+          <h1 class="title">Shared Plan Renderer</h1>
+        </div>
+        <div class="controls">
+          <label class="toggle" for="themeToggle">
+            <input type="checkbox" id="themeToggle" />
+            <span class="muted">Dark mode</span>
+          </label>
+          <div class="control-group">
+            <label for="planPicker">Choose plan</label>
+            <select id="planPicker"></select>
+          </div>
+        </div>
+      </div>
+
+      <section class="plan-header">
+        <h2 id="planTitle" class="plan-title"></h2>
+        <p id="planSubtitle" class="plan-subtitle"></p>
+        <p id="planOverview" class="muted"></p>
+      </section>
+
+      <section id="weeks" class="weeks"></section>
+    </main>
+
+    <script type="module">
+      import { PLANS } from "./plans/index.js";
+      import { initTheme } from "./theme.js";
+
+      const PLAN_KEY = "selected_plan_v1";
+
+      const planPicker = document.getElementById("planPicker");
+      const planTitle = document.getElementById("planTitle");
+      const planSubtitle = document.getElementById("planSubtitle");
+      const planOverview = document.getElementById("planOverview");
+      const weeksContainer = document.getElementById("weeks");
+
+      initTheme();
+
+      function getDefaultPlanId() {
+        const ids = Object.keys(PLANS);
+        if (ids.length === 0) return "";
+        const stored = localStorage.getItem(PLAN_KEY);
+        if (stored && ids.includes(stored)) return stored;
+        return ids[0];
+      }
+
+      function optionLabel(plan) {
+        const { name, subtitle } = plan.meta;
+        return subtitle ? `${name} — ${subtitle}` : name;
+      }
+
+      function populatePicker(activeId) {
+        planPicker.innerHTML = "";
+        Object.values(PLANS).forEach((plan) => {
+          const option = document.createElement("option");
+          option.value = plan.meta.id;
+          option.textContent = optionLabel(plan);
+          if (plan.meta.id === activeId) {
+            option.selected = true;
+          }
+          planPicker.append(option);
+        });
+      }
+
+      function renderPlan(plan) {
+        planTitle.textContent = plan.meta.name;
+        planSubtitle.textContent = plan.meta.subtitle || "";
+        planSubtitle.style.display = plan.meta.subtitle ? "block" : "none";
+        planOverview.textContent = plan.overview || "";
+        planOverview.style.display = plan.overview ? "block" : "none";
+
+        weeksContainer.innerHTML = "";
+        const weeks = plan.weeks || [];
+
+        weeks.forEach((week, idx) => {
+          const weekCard = document.createElement("article");
+          weekCard.className = "week";
+
+          const title = document.createElement("h3");
+          const label = week.title || `Week ${idx + 1}`;
+          title.textContent = label;
+          weekCard.append(title);
+
+          const days = week.days || [];
+          days.forEach((day) => {
+            const dayEl = document.createElement("div");
+            dayEl.className = "day";
+
+            const header = document.createElement("div");
+            header.className = "day-title";
+
+            const nameEl = document.createElement("p");
+            nameEl.className = "day-name";
+            nameEl.textContent = day.name || "Session";
+
+            header.append(nameEl);
+            dayEl.append(header);
+
+            if (day.focus) {
+              const focus = document.createElement("p");
+              focus.className = "day-focus";
+              focus.textContent = day.focus;
+              dayEl.append(focus);
+            }
+
+            if (Array.isArray(day.blocks) && day.blocks.length) {
+              const list = document.createElement("ul");
+              day.blocks.forEach((item) => {
+                const li = document.createElement("li");
+                li.textContent = item;
+                list.append(li);
+              });
+              dayEl.append(list);
+            }
+
+            weekCard.append(dayEl);
+          });
+
+          weeksContainer.append(weekCard);
+        });
+      }
+
+      function setActivePlan(planId) {
+        const plan = PLANS[planId];
+        if (!plan) return;
+        localStorage.setItem(PLAN_KEY, planId);
+        renderPlan(plan);
+      }
+
+      const startingPlanId = getDefaultPlanId();
+      populatePicker(startingPlanId);
+      setActivePlan(startingPlanId);
+
+      planPicker.addEventListener("change", (event) => {
+        setActivePlan(event.target.value);
+      });
+    </script>
+  </body>
+</html>
