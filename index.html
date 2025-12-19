@@ -162,6 +162,10 @@
             <label for="planPicker">Choose plan</label>
             <select id="planPicker"></select>
           </div>
+          <div class="control-group" id="weekPickerGroup">
+            <label for="weekPicker">Choose week</label>
+            <select id="weekPicker"></select>
+          </div>
         </div>
       </div>
 
@@ -176,18 +180,26 @@
 
     <script type="module">
       import { PLANS } from "./plans/index.js";
+      import { normalizePlan } from "./plans/adapter.js";
+      import { loadProgress, saveProgress } from "./progress.js";
       import { initTheme } from "./theme.js";
 
       const PLAN_KEY = "selected_plan_v1";
+      const WEEK_KEY_PREFIX = "selected_week_v1";
 
       const planPicker = document.getElementById("planPicker");
       const planTitle = document.getElementById("planTitle");
       const planSubtitle = document.getElementById("planSubtitle");
       const planOverview = document.getElementById("planOverview");
+      const weekPicker = document.getElementById("weekPicker");
+      const weekPickerGroup = document.getElementById("weekPickerGroup");
       const weeksContainer = document.getElementById("weeks");
 
       let currentPlanId;
       let currentPlan;
+      let normalizedPlan;
+      let selectedWeekId;
+      let progressState;
 
       initTheme();
 
@@ -217,30 +229,28 @@
         });
       }
 
-      function normalizeWeeks(plan) {
-        if (Array.isArray(plan.weeks)) {
-          return plan.weeks;
-        }
+      function populateWeekPicker(weeks, activeId) {
+        weekPicker.innerHTML = "";
 
-        if (Array.isArray(plan.days)) {
-          return [
-            {
-              title: plan.title || "Week 1",
-              days: plan.days,
-            },
-          ];
-        }
+        weeks.forEach((week) => {
+          const option = document.createElement("option");
+          option.value = week.id;
+          option.textContent = week.label;
+          if (week.id === activeId) {
+            option.selected = true;
+          }
+          weekPicker.append(option);
+        });
 
-        if (plan.days && typeof plan.days === "object") {
-          return [
-            {
-              title: plan.title || "Week 1",
-              days: Object.values(plan.days),
-            },
-          ];
+        if (weeks.length <= 1) {
+          weekPickerGroup.style.display = "none";
+        } else {
+          weekPickerGroup.style.display = "flex";
         }
+      }
 
-        return [];
+      function storageWeekKey(planId) {
+        return `${WEEK_KEY_PREFIX}:${planId}`;
       }
 
       function renderBlockItems(listEl, items = []) {
@@ -258,91 +268,157 @@
       }
 
       function renderPlan() {
-        if (!currentPlan) return;
+        if (!normalizedPlan) return;
 
-        planTitle.textContent = currentPlan.meta?.name || "";
-        planSubtitle.textContent = currentPlan.meta?.subtitle || "";
-        planSubtitle.style.display = currentPlan.meta?.subtitle ? "block" : "none";
-        planOverview.textContent = currentPlan.overview || "";
-        planOverview.style.display = currentPlan.overview ? "block" : "none";
+        planTitle.textContent = normalizedPlan.meta?.name || "";
+        planSubtitle.textContent = normalizedPlan.meta?.subtitle || "";
+        planSubtitle.style.display = normalizedPlan.meta?.subtitle ? "block" : "none";
+        planOverview.textContent = normalizedPlan.overview || "";
+        planOverview.style.display = normalizedPlan.overview ? "block" : "none";
 
         weeksContainer.innerHTML = "";
-        const weeks = normalizeWeeks(currentPlan);
+        const weeks = normalizedPlan.weeks || [];
+        const activeWeek = weeks.find((week) => week.id === selectedWeekId) || weeks[0];
+        if (!activeWeek) return;
 
-        weeks.forEach((week, idx) => {
-          const weekCard = document.createElement("article");
-          weekCard.className = "week";
+        const weekCard = document.createElement("article");
+        weekCard.className = "week";
 
-          const title = document.createElement("h3");
-          const label = week.title || `Week ${idx + 1}`;
-          title.textContent = label;
-          weekCard.append(title);
+        const title = document.createElement("h3");
+        title.textContent = activeWeek.label || "Training Week";
+        weekCard.append(title);
 
-          const days = week.days || [];
-          days.forEach((day) => {
-            const dayEl = document.createElement("div");
-            dayEl.className = "day";
+        const days = activeWeek.days || [];
+        days.forEach((day, idx) => {
+          const dayEl = document.createElement("div");
+          dayEl.className = "day";
 
-            const header = document.createElement("div");
-            header.className = "day-title";
+          const header = document.createElement("div");
+          header.className = "day-title";
 
-            const nameEl = document.createElement("p");
-            nameEl.className = "day-name";
-            nameEl.textContent = day.name || day.day || "Session";
+          const nameEl = document.createElement("p");
+          nameEl.className = "day-name";
+          const dayName = day.name || day.day || "Session";
+          nameEl.textContent = dayName;
 
-            header.append(nameEl);
+          header.append(nameEl);
 
-            if (day.tag || day.tagTemplate) {
-              const tagEl = document.createElement("span");
-              tagEl.className = "muted";
-              tagEl.textContent = day.tag || day.tagTemplate;
-              header.append(tagEl);
-            }
+          const dayTag = day.tag || day.tagTemplate;
+          const dayId = day.id || day.day || day.name || `day-${idx + 1}`;
+          const status = progressState?.completed?.includes(dayId)
+            ? "Done"
+            : progressState?.skipped?.includes(dayId)
+              ? "Skipped"
+              : "";
 
-            dayEl.append(header);
+          if (dayTag || status) {
+            const tagEl = document.createElement("span");
+            tagEl.className = "muted";
+            tagEl.textContent = status ? `${dayTag ? `${dayTag} • ` : ""}${status}` : dayTag;
+            header.append(tagEl);
+          }
 
-            if (day.focus) {
-              const focus = document.createElement("p");
-              focus.className = "day-focus";
-              focus.textContent = day.focus;
-              dayEl.append(focus);
-            }
+          dayEl.append(header);
 
-            if (Array.isArray(day.blocks) && day.blocks.length) {
-              day.blocks.forEach((block) => {
-                if (typeof block === "string") {
-                  const list = document.createElement("ul");
-                  const li = document.createElement("li");
-                  li.textContent = block;
-                  list.append(li);
+          if (day.focus) {
+            const focus = document.createElement("p");
+            focus.className = "day-focus";
+            focus.textContent = day.focus;
+            dayEl.append(focus);
+          }
+
+          if (Array.isArray(day.blocks) && day.blocks.length) {
+            day.blocks.forEach((block) => {
+              if (typeof block === "string") {
+                const list = document.createElement("ul");
+                const li = document.createElement("li");
+                li.textContent = block;
+                list.append(li);
+                dayEl.append(list);
+                return;
+              }
+
+              if (block && typeof block === "object") {
+                const list = document.createElement("ul");
+                renderBlockItems(list, block.items);
+
+                const hasContent = list.children.length > 0;
+                if (block.title && hasContent) {
+                  const titleEl = document.createElement("p");
+                  titleEl.className = "day-name";
+                  titleEl.textContent = block.title;
+                  dayEl.append(titleEl);
+                }
+
+                if (hasContent) {
                   dayEl.append(list);
-                  return;
                 }
+              }
+            });
+          }
 
-                if (block && typeof block === "object") {
-                  const list = document.createElement("ul");
-                  renderBlockItems(list, block.items);
+          const actionBar = document.createElement("div");
+          actionBar.className = "controls";
 
-                  const hasContent = list.children.length > 0;
-                  if (block.title && hasContent) {
-                    const titleEl = document.createElement("p");
-                    titleEl.className = "day-name";
-                    titleEl.textContent = block.title;
-                    dayEl.append(titleEl);
-                  }
+          const doneBtn = document.createElement("button");
+          doneBtn.textContent = "Done";
+          doneBtn.style.cursor = "pointer";
+          doneBtn.onclick = () => {
+            setDayStatus(dayId, "done");
+          };
 
-                  if (hasContent) {
-                    dayEl.append(list);
-                  }
-                }
-              });
-            }
+          const skipBtn = document.createElement("button");
+          skipBtn.textContent = "Skip";
+          skipBtn.style.cursor = "pointer";
+          skipBtn.onclick = () => {
+            setDayStatus(dayId, "skipped");
+          };
 
-            weekCard.append(dayEl);
-          });
+          if (status === "Done") {
+            doneBtn.disabled = true;
+          }
 
-          weeksContainer.append(weekCard);
+          if (status === "Skipped") {
+            skipBtn.disabled = true;
+          }
+
+          actionBar.append(doneBtn, skipBtn);
+          dayEl.append(actionBar);
+
+          weekCard.append(dayEl);
         });
+
+        weeksContainer.append(weekCard);
+      }
+
+      function setDayStatus(dayId, status) {
+        if (!progressState) return;
+        const completed = new Set(progressState.completed || []);
+        const skipped = new Set(progressState.skipped || []);
+
+        completed.delete(dayId);
+        skipped.delete(dayId);
+
+        if (status === "done") {
+          completed.add(dayId);
+        } else if (status === "skipped") {
+          skipped.add(dayId);
+        }
+
+        progressState = {
+          completed: Array.from(completed),
+          skipped: Array.from(skipped),
+        };
+
+        saveProgress(currentPlanId, selectedWeekId, progressState);
+        renderPlan();
+      }
+
+      function setActiveWeek(weekId) {
+        selectedWeekId = weekId;
+        progressState = loadProgress(currentPlanId, selectedWeekId);
+        localStorage.setItem(storageWeekKey(currentPlanId), selectedWeekId);
+        renderPlan();
       }
 
       function setActivePlan(planId) {
@@ -350,9 +426,19 @@
         if (!plan) return;
         currentPlanId = planId;
         currentPlan = plan;
+        normalizedPlan = normalizePlan(plan);
         localStorage.setItem(PLAN_KEY, planId);
         populatePicker(planId);
-        renderPlan();
+
+        const weeks = normalizedPlan.weeks || [];
+        const storedWeek = localStorage.getItem(storageWeekKey(planId));
+        const defaultWeek = weeks[0]?.id;
+        selectedWeekId = weeks.some((week) => week.id === storedWeek)
+          ? storedWeek
+          : defaultWeek;
+
+        populateWeekPicker(weeks, selectedWeekId);
+        setActiveWeek(selectedWeekId || defaultWeek);
       }
 
       const startingPlanId = getDefaultPlanId();
@@ -360,6 +446,10 @@
 
       planPicker.addEventListener("change", (event) => {
         setActivePlan(event.target.value);
+      });
+
+      weekPicker.addEventListener("change", (event) => {
+        setActiveWeek(event.target.value);
       });
     </script>
   </body>
