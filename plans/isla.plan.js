@@ -1,5 +1,9 @@
 export const ISLA_PLAN = {
-  totalWeeks: 12,
+  meta: {
+    id: "isla",
+    name: "Isla Plan",
+    weeks: 12,
+  },
   phases: [
     {
       maxWeek: 4,
