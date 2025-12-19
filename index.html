@@ -283,11 +283,11 @@
         currentPlanId = planId;
         currentPlan = plan;
         localStorage.setItem(PLAN_KEY, planId);
+        populatePicker(planId);
         renderPlan();
       }
 
       const startingPlanId = getDefaultPlanId();
-      populatePicker(startingPlanId);
       setActivePlan(startingPlanId);
 
       planPicker.addEventListener("change", (event) => {
