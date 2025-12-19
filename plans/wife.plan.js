@@ -1,11 +1,14 @@
 export const WIFE_PLAN = {
-  title: "Wife Fitness Plan",
-  subtitle: "DB + bodyweight • 30–45 min • knee-friendly • 7 days/week",
-  weeks: 12,
+  meta: {
+    id: "wife",
+    name: "Wife Fitness Plan",
+    subtitle: "DB + bodyweight • 30–45 min • knee-friendly • 7 days/week",
+    weeks: 12,
+  },
   phases: [
-    { upToWeek: 4, name: "Base", note: "Build habit + form. Keep it comfortable." },
-    { upToWeek: 8, name: "Build", note: "Add one extra set or a bit more pace." },
-    { upToWeek: 12, name: "Shape", note: "Slightly tougher intervals + steadier strength." }
+    { maxWeek: 4, name: "Base", note: "Build habit + form. Keep it comfortable." },
+    { maxWeek: 8, name: "Build", note: "Add one extra set or a bit more pace." },
+    { maxWeek: 12, name: "Shape", note: "Slightly tougher intervals + steadier strength." }
   ],
   repRanges: {
     light: "12–15 reps",
