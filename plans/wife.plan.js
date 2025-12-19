@@ -1,4 +1,9 @@
 export const WIFE_PLAN = {
+  meta: {
+    id: "wife",
+    name: "Wife Fitness Plan",
+    subtitle: "DB + bodyweight • 30–45 min • knee-friendly • 7 days/week",
+  },
   title: "Wife Fitness Plan",
   subtitle: "DB + bodyweight • 30–45 min • knee-friendly • 7 days/week",
   weeks: 12,

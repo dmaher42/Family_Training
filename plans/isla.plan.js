@@ -1,4 +1,9 @@
 export const ISLA_PLAN = {
+  meta: {
+    id: "isla",
+    name: "Isla Plan",
+    subtitle: "12-week strength + speed",
+  },
   totalWeeks: 12,
   phases: [
     {
