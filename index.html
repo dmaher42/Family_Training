@@ -186,6 +186,9 @@
       const planOverview = document.getElementById("planOverview");
       const weeksContainer = document.getElementById("weeks");
 
+      let currentPlanId;
+      let currentPlan;
+
       initTheme();
 
       function getDefaultPlanId() {
@@ -214,15 +217,17 @@
         });
       }
 
-      function renderPlan(plan) {
-        planTitle.textContent = plan.meta.name;
-        planSubtitle.textContent = plan.meta.subtitle || "";
-        planSubtitle.style.display = plan.meta.subtitle ? "block" : "none";
-        planOverview.textContent = plan.overview || "";
-        planOverview.style.display = plan.overview ? "block" : "none";
+      function renderPlan() {
+        if (!currentPlan) return;
+
+        planTitle.textContent = currentPlan.meta.name;
+        planSubtitle.textContent = currentPlan.meta.subtitle || "";
+        planSubtitle.style.display = currentPlan.meta.subtitle ? "block" : "none";
+        planOverview.textContent = currentPlan.overview || "";
+        planOverview.style.display = currentPlan.overview ? "block" : "none";
 
         weeksContainer.innerHTML = "";
-        const weeks = plan.weeks || [];
+        const weeks = currentPlan.weeks || [];
 
         weeks.forEach((week, idx) => {
           const weekCard = document.createElement("article");
@@ -275,8 +280,10 @@
       function setActivePlan(planId) {
         const plan = PLANS[planId];
         if (!plan) return;
+        currentPlanId = planId;
+        currentPlan = plan;
         localStorage.setItem(PLAN_KEY, planId);
-        renderPlan(plan);
+        renderPlan();
       }
 
       const startingPlanId = getDefaultPlanId();
