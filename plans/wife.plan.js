@@ -26,10 +26,10 @@ export const WIFE_PLAN = {
   strength: {
     lower: {
       title: "Strength (20–25 min)",
-      intro: "Do {{rounds}} rounds, rest ~60s between moves.",
+      intro: "Do {{rounds}} rounds, rest ~60s between moves. Aim for the last 2 reps to feel challenging but controlled.",
       squat: { on: "Chair goblet squat (pain-free depth)", off: "Goblet squat (controlled depth)" },
       moves: [
-        "{{squat}}: {{reps}}",
+        "{{squat}}: {{reps}} (Use a shorter range or higher box if knees feel pressure)",
         "DB Romanian deadlift: {{reps}}",
         "Glute bridge: 15 reps",
         "Standing calf raises: 15 reps"
@@ -37,7 +37,7 @@ export const WIFE_PLAN = {
     },
     upper: {
       title: "Strength (22–28 min)",
-      intro: "Do {{rounds}} rounds, rest ~60s between moves.",
+      intro: "Do {{rounds}} rounds, rest ~60s between moves. Aim for the last 2 reps to feel challenging but controlled.",
       moves: [
         "DB floor/bench press: {{reps}}",
         "One-arm DB row (chair/bench): {{reps}}/side",
@@ -48,10 +48,10 @@ export const WIFE_PLAN = {
     },
     full: {
       title: "Strength (22–28 min)",
-      intro: "Do {{rounds}} rounds, rest ~60s between moves.",
+      intro: "Do {{rounds}} rounds, rest ~60s between moves. Aim for the last 2 reps to feel challenging but controlled.",
       squat: { on: "Chair squat (goblet hold)", off: "Goblet squat" },
       moves: [
-        "{{squat}}: {{reps}}",
+        "{{squat}}: {{reps}} (Use a shorter range or higher box if knees feel pressure)",
         "DB Romanian deadlift: {{reps}}",
         "Incline push-ups: 8–10 reps",
         "Bent-over DB row: {{reps}}",
