@@ -65,6 +65,39 @@
         font-size: 14px;
       }
 
+      .btn {
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--card);
+        color: var(--fg);
+        font-size: 14px;
+        font-family: inherit;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .btn:hover:not(:disabled) {
+        border-color: var(--accent);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      .btn:active:not(:disabled) {
+        transform: translateY(0);
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background: var(--bg);
+        border-color: transparent;
+      }
+
       .toggle {
         display: inline-flex;
         align-items: center;
@@ -361,25 +394,29 @@
           actionBar.className = "controls";
 
           const doneBtn = document.createElement("button");
+          doneBtn.className = "btn";
           doneBtn.textContent = "Done";
-          doneBtn.style.cursor = "pointer";
+          doneBtn.setAttribute("aria-label", `Mark ${dayName} as done`);
           doneBtn.onclick = () => {
             setDayStatus(dayId, "done");
           };
 
           const skipBtn = document.createElement("button");
+          skipBtn.className = "btn";
           skipBtn.textContent = "Skip";
-          skipBtn.style.cursor = "pointer";
+          skipBtn.setAttribute("aria-label", `Skip ${dayName}`);
           skipBtn.onclick = () => {
             setDayStatus(dayId, "skipped");
           };
 
           if (status === "Done") {
             doneBtn.disabled = true;
+            doneBtn.textContent = "✓ Done";
           }
 
           if (status === "Skipped") {
             skipBtn.disabled = true;
+            skipBtn.textContent = "✕ Skipped";
           }
 
           actionBar.append(doneBtn, skipBtn);
