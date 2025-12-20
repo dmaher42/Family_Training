@@ -6,96 +6,136 @@
     <title>Family Training Hub</title>
     <link rel="stylesheet" href="./themes.css" />
     <style>
+      :root {
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      }
+
       * {
         box-sizing: border-box;
       }
 
       body {
         margin: 0;
-        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        font-family: var(--font-sans);
         background: var(--bg);
         color: var(--fg);
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.5;
       }
 
       main {
-        max-width: 1100px;
+        max-width: 1000px;
         margin: 0 auto;
-        padding: 24px 16px 48px;
+        padding: 32px 20px 64px;
       }
 
+      /* Top Bar */
       .top-bar {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
-        gap: 16px;
-        margin-bottom: 16px;
+        gap: 24px;
+        margin-bottom: 40px;
       }
 
       .title {
         margin: 0;
-        font-size: 28px;
-        font-weight: 700;
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        color: var(--fg);
       }
 
       .muted {
         color: var(--muted);
         font-size: 14px;
+        font-weight: 500;
       }
 
       .controls {
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 20px;
       }
 
       .control-group {
         display: flex;
         flex-direction: column;
-        gap: 4px;
-        font-size: 14px;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
       }
 
       select {
-        padding: 8px 10px;
+        padding: 10px 14px;
         border: 1px solid var(--border);
-        border-radius: 8px;
-        background: var(--card);
-        color: var(--fg);
-        font-size: 14px;
-      }
-
-      .btn {
-        padding: 8px 12px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
+        border-radius: var(--radius-sm);
         background: var(--card);
         color: var(--fg);
         font-size: 14px;
         font-family: inherit;
         font-weight: 500;
+        box-shadow: var(--shadow-sm);
         cursor: pointer;
-        transition: all 0.2s ease;
+        min-width: 160px;
+      }
+
+      select:focus {
+        outline: 2px solid var(--accent);
+        outline-offset: 1px;
+      }
+
+      /* Buttons */
+      .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 9999px; /* Pill shape */
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        justify-content: center;
+        gap: 8px;
+        min-width: 100px;
       }
 
-      .btn:hover:not(:disabled) {
-        border-color: var(--accent);
+      .btn-primary {
+        background: var(--fg);
+        color: var(--bg);
+      }
+
+      .btn-primary:hover:not(:disabled) {
         transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        opacity: 0.9;
+        box-shadow: var(--shadow-md);
       }
 
-      .btn:active:not(:disabled) {
-        transform: translateY(0);
+      .btn-ghost {
+        background: transparent;
+        color: var(--muted);
+        border: 1px solid transparent;
+      }
+
+      .btn-ghost:hover:not(:disabled) {
+        background: var(--bg);
+        color: var(--fg);
       }
 
       .btn:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        background: var(--bg);
-        border-color: transparent;
+        opacity: 0.5;
+        cursor: default;
       }
 
       .toggle {
@@ -103,79 +143,251 @@
         align-items: center;
         gap: 8px;
         cursor: pointer;
+        user-select: none;
       }
 
+      /* Plan Header */
       .plan-header {
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 16px;
-        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
-        margin-bottom: 20px;
+        margin-bottom: 40px;
       }
 
       .plan-title {
         margin: 0;
-        font-size: 22px;
-        font-weight: 700;
+        font-size: 36px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
       }
 
       .plan-subtitle {
-        margin: 6px 0 0;
+        margin: 12px 0 0;
         color: var(--muted);
-      }
-
-      .weeks {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 16px;
-      }
-
-      .week {
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 14px;
-        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
-      }
-
-      .week h3 {
-        margin: 0 0 12px;
         font-size: 18px;
+        font-weight: 500;
+        max-width: 600px;
       }
 
-      .day {
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 10px 12px;
-        margin-bottom: 10px;
+      #planOverview {
+        margin-top: 16px;
+        line-height: 1.6;
+        max-width: 700px;
       }
 
-      .day:last-child {
-        margin-bottom: 0;
+      /* Week Container */
+      .week-container {
+        margin-bottom: 48px;
       }
 
-      .day-title {
+      .week-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin: 0 0 24px;
+        letter-spacing: -0.02em;
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        gap: 12px;
+      }
+
+      .week-title::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+        opacity: 0.5;
+      }
+
+      /* Day Card */
+      .day-card {
+        background: var(--card);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(0,0,0,0.03); /* Soft border */
+        margin-bottom: 24px;
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .day-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+      }
+
+      .day-card.is-complete {
+        opacity: 0.85;
+        border-color: var(--border);
+      }
+
+      .day-card.is-skipped {
+        opacity: 0.6;
+        filter: grayscale(0.8);
+      }
+
+      /* Left Rail (Meta) */
+      .day-meta {
+        background: linear-gradient(to right, var(--bg), transparent); /* Subtle visual separation */
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border-right: 1px solid transparent; /* Cleaner without border, relying on bg */
+      }
+
+      [data-theme="dark"] .day-meta {
+          background: rgba(255, 255, 255, 0.03);
+      }
+
+      .day-header {
+        display: flex;
+        flex-direction: column;
         gap: 12px;
       }
 
       .day-name {
         margin: 0;
+        font-size: 18px;
         font-weight: 700;
+        color: var(--fg);
+        line-height: 1.3;
+      }
+
+      .day-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 99px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .badge-tag {
+        background: var(--bg);
+        color: var(--muted);
+        border: 1px solid var(--border);
+      }
+
+      .badge-status-done {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      [data-theme="dark"] .badge-status-done {
+        background: #14532d;
+        color: #dcfce7;
+      }
+
+      .badge-status-skipped {
+        background: var(--bg);
+        color: var(--muted);
+        text-decoration: line-through;
+      }
+
+      .day-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 24px;
+      }
+
+      /* Content Section */
+      .day-content {
+        padding: 24px 32px;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
       }
 
       .day-focus {
-        margin: 4px 0 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 16px;
+        background: var(--bg);
+        border-radius: var(--radius-md);
+        margin-bottom: 8px;
+      }
+
+      .focus-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 700;
         color: var(--muted);
-        font-size: 13px;
+      }
+
+      .day-focus p {
+        margin: 0;
+        font-size: 15px;
+        font-style: italic;
+        color: var(--fg);
+      }
+
+      .exercise-block {
+        /* Optional: distinct styling for blocks */
+      }
+
+      .block-title {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+        margin: 0 0 12px;
+        font-weight: 700;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 4px;
+        display: inline-block;
       }
 
       ul {
-        margin: 8px 0 0 18px;
-        padding: 0;
+        margin: 0;
+        padding-left: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      li {
+        color: var(--fg);
+        font-size: 15px;
+        line-height: 1.6;
+      }
+
+      /* Mobile Responsive */
+      @media (max-width: 768px) {
+        .day-card {
+          grid-template-columns: 1fr;
+        }
+
+        .day-meta {
+          flex-direction: row;
+          align-items: flex-start;
+          background: var(--bg);
+          border-bottom: 1px solid var(--border);
+          padding: 16px;
+        }
+
+        .day-actions {
+          margin-top: 0;
+          align-items: flex-end;
+        }
+
+        .day-content {
+          padding: 20px;
+        }
+
+        .btn {
+            min-width: auto;
+        }
       }
     </style>
   </head>
@@ -314,22 +526,27 @@
         const activeWeek = weeks.find((week) => week.id === selectedWeekId) || weeks[0];
         if (!activeWeek) return;
 
-        const weekCard = document.createElement("article");
-        weekCard.className = "week";
+        const weekCard = document.createElement("section");
+        weekCard.className = "week-container";
 
         const title = document.createElement("h3");
+        title.className = "week-title";
         title.textContent = activeWeek.label || "Training Week";
         weekCard.append(title);
 
         const days = activeWeek.days || [];
         days.forEach((day, idx) => {
-          const dayEl = document.createElement("div");
-          dayEl.className = "day";
+          const dayEl = document.createElement("article");
+          dayEl.className = "day-card";
 
-          const header = document.createElement("div");
-          header.className = "day-title";
+          // LEFT RAIL (Meta)
+          const metaEl = document.createElement("div");
+          metaEl.className = "day-meta";
 
-          const nameEl = document.createElement("p");
+          const header = document.createElement("header");
+          header.className = "day-header";
+
+          const nameEl = document.createElement("h4");
           nameEl.className = "day-name";
           const dayName = day.name || day.day || "Session";
           nameEl.textContent = dayName;
@@ -344,65 +561,92 @@
               ? "Skipped"
               : "";
 
+          // Status Badge
           if (dayTag || status) {
-            const tagEl = document.createElement("span");
-            tagEl.className = "muted";
-            tagEl.textContent = status ? `${dayTag ? `${dayTag} • ` : ""}${status}` : dayTag;
+            const tagEl = document.createElement("div");
+            tagEl.className = "day-tags";
+
+            if (dayTag) {
+                const badge = document.createElement("span");
+                badge.className = "badge badge-tag";
+                badge.textContent = dayTag;
+                tagEl.append(badge);
+            }
+            if (status) {
+                 const badge = document.createElement("span");
+                badge.className = `badge badge-status-${status.toLowerCase()}`;
+                badge.textContent = status;
+                tagEl.append(badge);
+            }
             header.append(tagEl);
           }
 
-          dayEl.append(header);
+          metaEl.append(header);
+
+          // CONTENT SECTION
+          const contentEl = document.createElement("div");
+          contentEl.className = "day-content";
 
           if (day.focus) {
-            const focus = document.createElement("p");
+            const focus = document.createElement("div");
             focus.className = "day-focus";
-            focus.textContent = day.focus;
-            dayEl.append(focus);
+            const label = document.createElement("span");
+            label.className = "focus-label";
+            label.textContent = "Focus";
+            const text = document.createElement("p");
+            text.textContent = day.focus;
+            focus.append(label, text);
+            contentEl.append(focus);
           }
 
           if (Array.isArray(day.blocks) && day.blocks.length) {
             day.blocks.forEach((block) => {
+              const blockWrapper = document.createElement("div");
+              blockWrapper.className = "exercise-block";
+
               if (typeof block === "string") {
                 const list = document.createElement("ul");
                 const li = document.createElement("li");
                 li.textContent = block;
                 list.append(li);
-                dayEl.append(list);
+                blockWrapper.append(list);
+                contentEl.append(blockWrapper);
                 return;
               }
 
               if (block && typeof block === "object") {
+                 if (block.title) {
+                  const titleEl = document.createElement("h5");
+                  titleEl.className = "block-title";
+                  titleEl.textContent = block.title;
+                  blockWrapper.append(titleEl);
+                }
+
                 const list = document.createElement("ul");
                 renderBlockItems(list, block.items);
 
-                const hasContent = list.children.length > 0;
-                if (block.title && hasContent) {
-                  const titleEl = document.createElement("p");
-                  titleEl.className = "day-name";
-                  titleEl.textContent = block.title;
-                  dayEl.append(titleEl);
-                }
-
-                if (hasContent) {
-                  dayEl.append(list);
+                if (list.children.length > 0) {
+                  blockWrapper.append(list);
+                  contentEl.append(blockWrapper);
                 }
               }
             });
           }
 
+          // Controls moved to Meta in Left Rail
           const actionBar = document.createElement("div");
-          actionBar.className = "controls";
+          actionBar.className = "day-actions";
 
           const doneBtn = document.createElement("button");
-          doneBtn.className = "btn";
-          doneBtn.textContent = "Done";
+          doneBtn.className = "btn btn-primary";
+          doneBtn.textContent = "Complete";
           doneBtn.setAttribute("aria-label", `Mark ${dayName} as done`);
           doneBtn.onclick = () => {
             setDayStatus(dayId, "done");
           };
 
           const skipBtn = document.createElement("button");
-          skipBtn.className = "btn";
+          skipBtn.className = "btn btn-ghost";
           skipBtn.textContent = "Skip";
           skipBtn.setAttribute("aria-label", `Skip ${dayName}`);
           skipBtn.onclick = () => {
@@ -411,17 +655,20 @@
 
           if (status === "Done") {
             doneBtn.disabled = true;
-            doneBtn.textContent = "✓ Done";
+            doneBtn.textContent = "Completed";
+            dayEl.classList.add("is-complete");
           }
 
           if (status === "Skipped") {
             skipBtn.disabled = true;
-            skipBtn.textContent = "✕ Skipped";
+            skipBtn.textContent = "Skipped";
+             dayEl.classList.add("is-skipped");
           }
 
           actionBar.append(doneBtn, skipBtn);
-          dayEl.append(actionBar);
+          metaEl.append(actionBar);
 
+          dayEl.append(metaEl, contentEl);
           weekCard.append(dayEl);
         });
 
