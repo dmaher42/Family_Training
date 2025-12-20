@@ -750,9 +750,21 @@
       }
 
       function closeCoachBonusModal() {
-          if (coachBonusLastFocused && typeof coachBonusLastFocused.focus === "function") {
-              coachBonusLastFocused.focus();
+          const activeElement = document.activeElement;
+          const focusTarget = (coachBonusLastFocused && typeof coachBonusLastFocused.focus === "function")
+            ? coachBonusLastFocused
+            : startTodayBtn;
+
+          if (coachBonusModalBackdrop.contains(activeElement)) {
+              if (focusTarget && typeof focusTarget.focus === "function") {
+                  focusTarget.focus();
+              } else {
+                  document.body.setAttribute("tabindex", "-1");
+                  document.body.focus();
+                  document.body.removeAttribute("tabindex");
+              }
           }
+
           coachBonusModalBackdrop.setAttribute("aria-hidden", "true");
           setTimeout(() => {
              if (coachBonusModalBackdrop.getAttribute("aria-hidden") === "true") {
