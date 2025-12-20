@@ -1,0 +1,13 @@
+127.0.0.1 - - [20/Dec/2025 01:30:07] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [20/Dec/2025 01:30:07] "GET /themes.css HTTP/1.1" 200 -
+127.0.0.1 - - [20/Dec/2025 01:30:08] "GET /plans/adapter.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/Dec/2025 01:30:08] "GET /plans/resolve.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/Dec/2025 01:30:08] "GET /plans/index.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/Dec/2025 01:30:08] "GET /progress.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/Dec/2025 01:30:08] "GET /theme.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/Dec/2025 01:30:08] "GET /plans/isla.plan.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/Dec/2025 01:30:08] "GET /plans/wife.plan.js HTTP/1.1" 200 -
+127.0.0.1 - - [20/Dec/2025 01:30:08] code 404, message File not found
+127.0.0.1 - - [20/Dec/2025 01:30:08] "GET /assets/img/box-squat.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [20/Dec/2025 01:30:09] code 404, message File not found
+127.0.0.1 - - [20/Dec/2025 01:30:09] "GET /assets/img/incline-pushup.jpg HTTP/1.1" 404 -
