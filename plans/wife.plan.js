@@ -83,7 +83,7 @@ export const WIFE_PLAN = {
       focus: "Lower + Core",
       tag: "Knee-friendly strength",
       blocks: [
-        { title: "Warm-up (5 min)", items: ["March in place 2 min", "Hip circles + arm swings", "Sit-to-stand from chair × 10"] },
+        { title: "Warm-up (5 min)", items: ["Treadmill walking (easy pace) 2 min", "Hip circles + arm swings", "Sit-to-stand from chair × 10"] },
         { type: "strengthLower" },
         { title: "Core (5–8 min)", items: ["Dead bugs: 3×10/side", "Side plank (knees down ok): 2×20s/side", "Optional: glute bridge hold 2×20s"] },
         { title: "Cool down (2–5 min)", items: ["Easy walk around house + light stretching"] }
@@ -124,7 +124,7 @@ export const WIFE_PLAN = {
       focus: "Full Body",
       tag: "Strength",
       blocks: [
-        { title: "Warm-up (5 min)", items: ["March 2 min", "Hip hinge practice × 8", "Incline push-ups × 8"] },
+        { title: "Warm-up (5 min)", items: ["Treadmill walking (easy pace) 2 min", "Hip hinge practice × 8", "Incline push-ups × 8"] },
         { type: "strengthFull" },
         { title: "Mobility (3–7 min)", items: ["Hamstrings", "Hips", "Upper back"] }
       ]
