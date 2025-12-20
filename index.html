@@ -637,6 +637,17 @@
         font-size: 14px;
       }
 
+      .modal-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-top: 1px solid var(--border);
+        background: var(--bg);
+        border-bottom-left-radius: var(--radius-lg);
+        border-bottom-right-radius: var(--radius-lg);
+      }
+
       /* List Item with View Action */
       .list-item-actionable {
         display: flex;
@@ -685,6 +696,11 @@
           <button id="exerciseModalClose" aria-label="Close" class="btn-icon">✕</button>
         </div>
         <div class="modal-body" id="exerciseModalBody"></div>
+        <div class="modal-footer" id="exerciseModalFooter">
+            <button id="exerciseModalPrev" class="btn btn-ghost" aria-label="Previous exercise">← Prev</button>
+            <span id="exerciseModalCounter" class="muted" style="font-size: 13px; font-weight: 500;"></span>
+            <button id="exerciseModalNext" class="btn btn-primary" aria-label="Next exercise">Next →</button>
+        </div>
       </div>
     </div>
 
@@ -800,13 +816,51 @@
       const exerciseModalTitle = document.getElementById("exerciseModalTitle");
       const exerciseModalBody = document.getElementById("exerciseModalBody");
       const exerciseModalClose = document.getElementById("exerciseModalClose");
+      const exerciseModalPrev = document.getElementById("exerciseModalPrev");
+      const exerciseModalNext = document.getElementById("exerciseModalNext");
+      const exerciseModalCounter = document.getElementById("exerciseModalCounter");
       let lastFocusedElement = null;
 
-      function openExerciseModal(exKey) {
+      let modalState = {
+        exKeys: [],
+        index: 0
+      };
+
+      function openExerciseModal(exKey, triggerElement) {
+          // Capture context
+          if (triggerElement) {
+              const dayCard = triggerElement.closest('.day-card');
+              if (dayCard && dayCard.dataset.exkeys) {
+                  const keys = dayCard.dataset.exkeys.split('|');
+                  const idx = keys.indexOf(exKey);
+                  modalState = { exKeys: keys, index: idx !== -1 ? idx : 0 };
+              } else {
+                   modalState = { exKeys: [exKey], index: 0 };
+              }
+          } else {
+              // Fallback or external call
+              modalState = { exKeys: [exKey], index: 0 };
+          }
+
+          lastFocusedElement = document.activeElement;
+          renderExerciseInModal(exKey);
+
+          // Show
+          exerciseModalBackdrop.hidden = false;
+          requestAnimationFrame(() => {
+              exerciseModalBackdrop.setAttribute("aria-hidden", "false");
+          });
+
+          document.body.style.overflow = "hidden";
+
+          // Manage focus
+          exerciseModalClose.focus();
+      }
+
+      function renderExerciseInModal(exKey) {
           const exercise = currentPlan.exercises?.[exKey];
           if (!exercise) return;
 
-          lastFocusedElement = document.activeElement;
           exerciseModalTitle.textContent = exKey;
           exerciseModalBody.innerHTML = "";
 
@@ -848,15 +902,36 @@
               exerciseModalBody.append(note);
           }
 
-          // Show
-          exerciseModalBackdrop.hidden = false;
-          // Trigger reflow/wait for next frame for transition
-          requestAnimationFrame(() => {
-              exerciseModalBackdrop.setAttribute("aria-hidden", "false");
-          });
+          updateModalControls();
+      }
 
-          document.body.style.overflow = "hidden";
-          exerciseModalClose.focus();
+      function updateModalControls() {
+          const { index, exKeys } = modalState;
+          const count = exKeys.length;
+
+          exerciseModalCounter.textContent = `${index + 1} / ${count}`;
+
+          const disabled = count <= 1;
+          exerciseModalPrev.disabled = disabled;
+          exerciseModalNext.disabled = disabled;
+      }
+
+      function nextExercise() {
+          if (modalState.exKeys.length <= 1) return;
+          let newIndex = modalState.index + 1;
+          if (newIndex >= modalState.exKeys.length) newIndex = 0;
+
+          modalState.index = newIndex;
+          renderExerciseInModal(modalState.exKeys[newIndex]);
+      }
+
+      function prevExercise() {
+          if (modalState.exKeys.length <= 1) return;
+          let newIndex = modalState.index - 1;
+          if (newIndex < 0) newIndex = modalState.exKeys.length - 1;
+
+          modalState.index = newIndex;
+          renderExerciseInModal(modalState.exKeys[newIndex]);
       }
 
       function closeExerciseModal() {
@@ -875,15 +950,24 @@
       }
 
       // Modal Listeners
+      exerciseModalPrev.onclick = prevExercise;
+      exerciseModalNext.onclick = nextExercise;
+
       exerciseModalClose.addEventListener("click", closeExerciseModal);
       exerciseModalBackdrop.addEventListener("click", (e) => {
           if (e.target === exerciseModalBackdrop) closeExerciseModal();
       });
       document.addEventListener("keydown", (e) => {
-          if (e.key === "Escape" && exerciseModalBackdrop.getAttribute("aria-hidden") === "false") {
+          const isOpen = exerciseModalBackdrop.getAttribute("aria-hidden") === "false";
+          if (!isOpen) return;
+
+          if (e.key === "Escape") {
               closeExerciseModal();
-          }
-           if (e.key === "Tab" && exerciseModalBackdrop.getAttribute("aria-hidden") === "false") {
+          } else if (e.key === "ArrowRight") {
+              nextExercise();
+          } else if (e.key === "ArrowLeft") {
+              prevExercise();
+          } else if (e.key === "Tab") {
                // Simple Focus Trap
                 const focusable = exerciseModalBackdrop.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
                 if (focusable.length === 0) return;
@@ -1001,12 +1085,12 @@
 
               div.onclick = (e) => {
                   e.stopPropagation();
-                  openExerciseModal(exKey);
+                  openExerciseModal(exKey, e.currentTarget);
               };
               div.onkeydown = (e) => {
                   if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      openExerciseModal(exKey);
+                      openExerciseModal(exKey, e.currentTarget);
                   }
               };
 
@@ -1080,6 +1164,23 @@
           // LEFT RAIL (Meta)
           const metaEl = document.createElement("div");
           metaEl.className = "day-meta";
+
+          // Collect Exercise Keys for Context
+          const dayExKeys = [];
+          if (Array.isArray(day.blocks)) {
+              day.blocks.forEach(block => {
+                  const items = (typeof block === 'object' && block.items) ? block.items : [];
+                  items.forEach(item => {
+                     const k = (typeof item === 'object') ? item.exKey : null;
+                     if (k && currentPlan.exercises?.[k] && !dayExKeys.includes(k)) {
+                         dayExKeys.push(k);
+                     }
+                  });
+              });
+          }
+          if (dayExKeys.length > 0) {
+              dayEl.dataset.exkeys = dayExKeys.join('|');
+          }
 
           const header = document.createElement("header");
           header.className = "day-header";
