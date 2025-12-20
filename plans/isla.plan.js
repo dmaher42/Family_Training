@@ -210,6 +210,7 @@ export const ISLA_PLAN = {
         {
           title: "Main (Rounds: {strengthRounds})",
           items: [
+            { text: "Quality focus: smooth, controlled reps" },
             { ref: "squatVar" },
             { ref: "pushVar" },
             { ref: "balanceVar" },
@@ -283,6 +284,7 @@ export const ISLA_PLAN = {
         {
           title: "Main (Rounds: {strengthRounds})",
           items: [
+            { text: "Stop early if speed or posture drops" },
             { text: "{splitSquat}" },
             { ref: "hingeVar" },
             { ref: "rowVar" },
