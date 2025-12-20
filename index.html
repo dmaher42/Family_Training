@@ -5,120 +5,177 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Family Training Hub</title>
     <link rel="stylesheet" href="./themes.css" />
+    
     <style>
       :root {
         --radius-sm: 10px;
         --radius-md: 16px;
-        --radius-lg: 20px;
-        --shadow-sm: 0 4px 10px rgb(0 0 0 / 0.04);
-        --shadow-md: 0 10px 30px rgb(0 0 0 / 0.08);
-        --shadow-lg: 0 18px 40px rgb(0 0 0 / 0.16);
+        --radius-lg: 22px;
+        --shadow-sm: 0 6px 20px rgb(0 0 0 / 0.05);
+        --shadow-md: 0 12px 30px rgb(0 0 0 / 0.12);
+        --shadow-lg: 0 16px 40px rgb(0 0 0 / 0.18);
         --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       }
 
-      * {
-        box-sizing: border-box;
-      }
+      * { box-sizing: border-box; }
 
       body {
         margin: 0;
         font-family: var(--font-sans);
         background: var(--bg);
+        background-attachment: fixed;
         color: var(--fg);
         -webkit-font-smoothing: antialiased;
         line-height: 1.6;
+        position: relative;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background: var(--texture);
+        opacity: 1;
+        mix-blend-mode: normal;
+        z-index: -1;
       }
 
       main {
-        max-width: 1000px;
+        max-width: 1040px;
         margin: 0 auto;
-        padding: 36px 20px 72px;
+        padding: 32px 18px 80px;
         display: flex;
         flex-direction: column;
-        gap: 20px;
-      }
-
-      /* Top Bar */
-      .top-bar {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 24px;
-        padding: 22px 24px;
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-sm);
-        margin-bottom: 12px;
-      }
-
-      .title {
-        margin: 0;
-        font-size: 26px;
-        font-weight: 800;
-        letter-spacing: -0.03em;
-        color: var(--fg);
-      }
-
-      .muted {
-        color: var(--muted);
-        font-size: 14px;
-        font-weight: 500;
-        line-height: 1.6;
-      }
-
-      .controls {
-        display: flex;
-        align-items: center;
         gap: 18px;
       }
 
-      .control-group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--muted);
+      .shell {
+        background: linear-gradient(135deg, rgba(255,255,255,0.72), rgba(255,255,255,0.56));
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        box-shadow: var(--shadow-soft);
+        padding: 24px;
+        backdrop-filter: blur(12px);
       }
 
+      .muted { color: var(--muted); font-size: 14px; font-weight: 500; }
+
+      /* Hero */
+      .hero {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .hero-left { display: flex; gap: 14px; align-items: center; }
+
+      .plan-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-size: 26px;
+        font-weight: 800;
+        box-shadow: var(--shadow-md);
+      }
+
+      .title-stack h1 { margin: 0; font-size: 34px; letter-spacing: -0.03em; }
+      .title-stack p { margin: 4px 0 0; font-weight: 600; color: var(--muted); }
+
+      .hero-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+      /* Toggle switch */
+      .toggle { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; font-size: 12px; color: var(--muted); }
+      .toggle input { display: none; }
+      .switch {
+        width: 56px;
+        height: 30px;
+        background: var(--border);
+        border-radius: 999px;
+        position: relative;
+        transition: background 0.2s ease;
+        box-shadow: inset 0 2px 6px rgb(0 0 0 / 0.08);
+      }
+      .switch::after {
+        content: "";
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--elevated);
+        box-shadow: var(--shadow-sm);
+        top: 3px;
+        left: 3px;
+        transition: transform 0.2s ease, background 0.2s ease;
+      }
+      .toggle input:checked + .switch {
+        background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      }
+      .toggle input:checked + .switch::after { transform: translateX(26px); background: #fff; }
+
+      /* Today strip */
+      .today-strip {
+        margin-top: 14px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        background: linear-gradient(120deg, rgba(91, 123, 255, 0.12), rgba(255, 255, 255, 0.8));
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .today-title { font-weight: 800; font-size: 16px; letter-spacing: 0.02em; }
+
+      /* Toolbar */
+      .toolbar {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+        margin-top: 12px;
+      }
+      .toolbar-card {
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 14px 16px;
+        background: var(--card);
+        box-shadow: var(--shadow-sm);
+      }
+      .control-group { display: flex; flex-direction: column; gap: 8px; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); font-weight: 800; }
       select {
         padding: 12px 14px;
         border: 1px solid var(--border);
-        border-radius: var(--radius-md);
-        background: var(--card);
+        border-radius: 14px;
+        background: var(--elevated);
         color: var(--fg);
-        font-size: 14px;
-        font-family: inherit;
-        font-weight: 600;
-        box-shadow: var(--shadow-sm);
+        font-size: 15px;
+        font-weight: 700;
+        box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6), var(--shadow-sm);
         cursor: pointer;
         min-width: 170px;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-        height: 44px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+        height: 46px;
       }
-
-      select:hover {
-        border-color: var(--accent);
-      }
-
-      select:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(92, 124, 255, 0.25), var(--shadow-sm);
-      }
+      select:hover { border-color: var(--accent); transform: translateY(-1px); }
+      select:focus { outline: none; box-shadow: 0 0 0 3px rgba(91, 123, 255, 0.25), var(--shadow-sm); }
 
       /* Buttons */
       .btn {
-        padding: 10px 18px;
+        padding: 11px 18px;
         border: 1px solid transparent;
-        border-radius: 9999px;
+        border-radius: 12px;
         font-size: 14px;
-        font-weight: 700;
+        font-weight: 800;
         cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -127,321 +184,115 @@
         height: 44px;
         box-shadow: var(--shadow-sm);
       }
+      .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-strong)); color: #fff; }
+      .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-md); filter: brightness(1.03); }
+      .btn-ghost { background: transparent; color: var(--fg); border: 1px solid var(--border); }
+      .btn-ghost:hover:not(:disabled) { background: var(--card); box-shadow: var(--shadow-sm); }
+      .btn-outline { background: var(--elevated); border: 1px solid var(--border); color: var(--fg); }
+      .btn:disabled { opacity: 0.55; cursor: default; }
+      .btn:focus-visible, select:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(92, 124, 255, 0.35), var(--shadow-sm); }
 
-      .btn-primary {
-        background: var(--accent);
-        color: #fff;
-      }
-
-      .btn-primary:hover:not(:disabled) {
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-md);
-        filter: brightness(1.03);
-      }
-
-      .btn-ghost {
-        background: transparent;
-        color: var(--fg);
-        border: 1px solid var(--border);
-      }
-
-      .btn-ghost:hover:not(:disabled) {
-        background: var(--card);
-        color: var(--fg);
-        box-shadow: var(--shadow-sm);
-      }
-
-      .btn:disabled {
-        opacity: 0.5;
-        cursor: default;
-      }
-
-      .btn:focus-visible, select:focus-visible {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(92, 124, 255, 0.35), var(--shadow-sm);
-      }
-
-      .toggle {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        user-select: none;
-      }
-
-      /* Plan Header */
-      .plan-header {
-        margin-bottom: 20px;
-        padding: 20px 24px;
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-sm);
-      }
-
-      .plan-title {
-        margin: 0;
-        font-size: 38px;
-        font-weight: 800;
-        letter-spacing: -0.04em;
-        line-height: 1.08;
-      }
-
-      .plan-subtitle {
-        margin: 12px 0 0;
-        color: var(--muted);
-        font-size: 17px;
-        font-weight: 600;
-        max-width: 600px;
-      }
-
-      #planOverview {
-        margin-top: 16px;
-        line-height: 1.6;
-        max-width: 700px;
-      }
-
-      /* Week Container */
-      .week-container {
-        margin-bottom: 48px;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-      }
-
-      .week-title {
-        font-size: 21px;
-        font-weight: 800;
-        margin: 0 0 8px;
-        letter-spacing: -0.02em;
-        display: flex;
+      /* Weekly progress */
+      .weekly-progress {
+        display: grid;
+        grid-template-columns: 1fr auto;
         align-items: center;
         gap: 12px;
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        background: linear-gradient(120deg, rgba(91,123,255,0.1), rgba(255,255,255,0.85));
       }
+      .weekly-progress .stat { display: flex; flex-direction: column; gap: 4px; }
+      .weekly-progress .stat strong { font-size: 20px; }
+      .progress-track { width: 100%; height: 10px; border-radius: 10px; background: rgba(0,0,0,0.06); overflow: hidden; }
+      .progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-strong)); border-radius: 10px; transition: width 0.4s ease; }
 
-      .week-title::after {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: var(--border);
-        opacity: 0.7;
+      /* Day chips */
+      .day-chip-bar {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 8px 2px 4px;
+        scrollbar-width: thin;
       }
+      .day-chip {
+        min-width: 130px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: var(--elevated);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      }
+      .day-chip:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+      .day-chip.active { border-color: var(--accent); background: rgba(91,123,255,0.08); box-shadow: var(--shadow-sm); }
+      .chip-top { display: flex; justify-content: space-between; align-items: center; font-weight: 800; }
+      .chip-focus { color: var(--muted); font-size: 13px; }
+      .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #cbd5e1; }
+      .status-dot.done { background: #16a34a; }
+      .status-dot.skipped { background: #f59e0b; }
+
+      /* Week Container */
+      .week-container { display: flex; flex-direction: column; gap: 16px; }
+      .week-title { font-size: 22px; font-weight: 800; margin: 4px 0 0; letter-spacing: -0.02em; }
 
       /* Day Card */
       .day-card {
         background: var(--card);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-sm);
+        border-radius: 20px;
+        box-shadow: var(--shadow-soft);
         border: 1px solid var(--border);
         margin-bottom: 16px;
-        display: grid;
-        grid-template-columns: 260px 1fr;
-        overflow: hidden;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-
-      .day-card:hover {
-        box-shadow: var(--shadow-md);
-        transform: translateY(-3px);
-      }
-
-      .day-card.is-complete {
-        opacity: 0.9;
-        border-color: rgba(92, 124, 255, 0.35);
-      }
-
-      .day-card.is-skipped {
-        opacity: 0.6;
-        filter: grayscale(0.8);
-      }
-
-      /* Left Rail (Meta) */
-      .day-meta {
-        background: linear-gradient(to right, var(--bg) 70%, transparent);
-        padding: 26px 24px;
+        padding: 20px 18px 18px;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        border-right: 1px solid var(--border);
-        opacity: 0.98;
+        gap: 14px;
+        scroll-margin-top: 120px;
       }
+      .day-card.is-complete { border-color: rgba(22, 163, 74, 0.35); }
+      .day-card.is-skipped { border-color: rgba(245, 158, 11, 0.4); opacity: 0.9; }
 
-      [data-theme="dark"] .day-meta {
-          background: rgba(255, 255, 255, 0.04);
-      }
+      .day-header { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; }
+      .day-title { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+      .day-meta-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+      .pill { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border); font-size: 12px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
+      .pill.done { background: rgba(22, 163, 74, 0.12); color: #166534; border-color: rgba(22,163,74,0.35); }
+      .pill.skipped { background: rgba(245, 158, 11, 0.16); color: #92400e; border-color: rgba(245,158,11,0.35); }
 
-      .day-header {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-      }
+      .variation-row { display: flex; gap: 8px; flex-wrap: wrap; }
+      .chip { padding: 6px 10px; border-radius: 10px; background: rgba(0,0,0,0.05); color: var(--fg); font-weight: 700; font-size: 12px; border: 1px solid var(--border); }
 
-      .day-name {
-        margin: 0;
-        font-size: 20px;
-        font-weight: 800;
-        color: var(--fg);
-        line-height: 1.3;
-      }
+      .day-progress { display: flex; align-items: center; gap: 10px; }
+      .day-progress small { color: var(--muted); font-weight: 700; }
+      .day-progress .progress-track { background: rgba(0,0,0,0.08); height: 8px; }
 
-      .day-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-      }
+      .day-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
-      .badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 6px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.03em;
-        border: 1px solid var(--border);
-        background: rgba(92, 124, 255, 0.06);
-        color: var(--muted);
-      }
+      /* Focus card */
+      .day-focus { padding: 14px 16px; background: var(--elevated); border-radius: 14px; border: 1px solid var(--border); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6); }
+      .focus-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 800; color: var(--muted); }
+      .day-focus p { margin: 4px 0 0; font-size: 15px; }
 
-      [data-theme="dark"] .badge {
-        background: rgba(127, 161, 255, 0.14);
-        border-color: rgba(127, 161, 255, 0.35);
-        color: var(--fg);
-      }
+      /* Exercise blocks */
+      .block-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+      .exercise-block { padding: 16px; background: var(--elevated); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow-sm); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+      .exercise-block:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+      .block-title { margin: 0 0 10px; display: flex; align-items: center; gap: 8px; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+      .block-icon { font-size: 18px; }
 
-      .badge-tag {
-        background: var(--card);
-        color: var(--fg);
-      }
+      ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+      li { color: var(--fg); font-size: 15px; line-height: 1.5; }
+      .exercise-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid transparent; transition: background 0.2s ease, border-color 0.2s ease; cursor: default; }
+      .exercise-row.actionable { cursor: pointer; border-color: var(--border); }
+      .exercise-row.actionable:hover { background: rgba(91,123,255,0.08); }
+      .view-chip { font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); display: inline-flex; align-items: center; gap: 6px; }
 
-      .badge-status-done {
-        background: rgba(34, 197, 94, 0.12);
-        color: #166534;
-        border-color: rgba(34, 197, 94, 0.35);
-      }
-
-      [data-theme="dark"] .badge-status-done {
-        background: rgba(34, 197, 94, 0.2);
-        color: #bbf7d0;
-      }
-
-      .badge-status-skipped {
-        background: var(--card);
-        color: var(--muted);
-        text-decoration: line-through;
-      }
-
-      .day-actions {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        margin-top: 24px;
-      }
-
-      /* Content Section */
-      .day-content {
-        padding: 28px 32px;
-        min-height: 200px;
-        display: flex;
-        flex-direction: column;
-        gap: 26px;
-        background: radial-gradient(circle at top left, rgba(92, 124, 255, 0.05), transparent 45%);
-      }
-
-      .day-focus {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        padding: 16px 18px;
-        background: var(--card);
-        border-radius: var(--radius-md);
-        margin-bottom: 8px;
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow-sm);
-      }
-
-      .focus-label {
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        font-weight: 800;
-        color: var(--muted);
-      }
-
-      .day-focus p {
-        margin: 0;
-        font-size: 15px;
-        font-style: italic;
-        color: var(--fg);
-      }
-
-      .exercise-block {
-        padding: 18px 20px;
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
-        box-shadow: var(--shadow-sm);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-
-      .exercise-block:hover {
-        box-shadow: var(--shadow-md);
-        transform: translateY(-2px);
-      }
-
-      .block-title {
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        color: var(--muted);
-        margin: 0 0 10px;
-        font-weight: 800;
-        border-bottom: 1px solid var(--border);
-        padding-bottom: 6px;
-        display: inline-block;
-      }
-
-      ul {
-        margin: 0;
-        padding-left: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      li {
-        color: var(--fg);
-        font-size: 15px;
-        line-height: 1.65;
-      }
-
-      /* Mobile Responsive */
-      @media (max-width: 768px) {
-        .day-card {
-          grid-template-columns: 1fr;
-        }
-
-        .day-meta {
-          flex-direction: row;
-          align-items: flex-start;
-          background: var(--card);
-          border-bottom: 1px solid var(--border);
-          padding: 16px;
-        }
-
-        .day-actions {
-          margin-top: 0;
-          align-items: flex-end;
-        }
-
-        .day-content {
-          padding: 20px;
-        }
-
-        .btn {
-            min-width: auto;
-        }
-      }
+      /* Today anchor button */
+      .anchor-btn { min-width: 140px; }
 
       /* Gamification Styles */
       .gamification-dashboard {
@@ -469,276 +320,54 @@
         gap: 12px;
       }
 
-      .scorecard-stats {
-        display: flex;
-        gap: 24px;
-      }
+      .scorecard-stats { display: flex; gap: 24px; }
+      .stat-item { display: flex; flex-direction: column; }
+      .stat-value { font-size: 24px; font-weight: 800; color: var(--accent); }
+      .stat-label { font-size: 12px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
 
-      .stat-item {
-        display: flex;
-        flex-direction: column;
-      }
+      .coach-message { font-style: italic; color: var(--fg); margin-top: 8px; font-size: 15px; border-left: 3px solid var(--accent); padding-left: 12px; max-width: 600px; }
 
-      .stat-value {
-        font-size: 24px;
-        font-weight: 800;
-        color: var(--accent);
-      }
+      .badges-container { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
 
-      .stat-label {
-        font-size: 12px;
-        color: var(--muted);
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-      }
+      .gamification-dashboard .achievement-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; background: rgba(92, 124, 255, 0.1); color: var(--fg); border: 1px solid var(--border); }
 
-      .coach-message {
-        font-style: italic;
-        color: var(--fg);
-        margin-top: 8px;
-        font-size: 15px;
-        border-left: 3px solid var(--accent);
-        padding-left: 12px;
-        max-width: 600px;
-      }
+      .competition-line { margin-top: 12px; font-size: 13px; color: var(--muted); font-weight: 700; }
 
-      .badges-container {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-top: 16px;
-        padding-top: 16px;
-        border-top: 1px solid var(--border);
-      }
+      /* Modal Styles */
+      .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 7, 35, 0.35); backdrop-filter: blur(6px); display: grid; place-items: center; z-index: 999; padding: 18px; transition: opacity 0.2s ease; }
+      .modal { background: var(--card); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--border); max-width: 560px; width: 100%; max-height: 90vh; overflow: hidden; }
 
-      .gamification-dashboard .achievement-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 600;
-        background: var(--bg);
-        border: 1px solid var(--border);
-        opacity: 0.5; /* Locked state */
-        transition: all 0.3s ease;
-      }
+      .modal-body { padding: 18px 20px 8px; overflow-y: auto; max-height: 60vh; }
+      .modal-header { padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: linear-gradient(120deg, rgba(92, 124, 255, 0.06), transparent); }
+      .modal-header h2 { margin: 0; font-size: 20px; }
+      .btn-icon { background: transparent; border: 1px solid var(--border); width: 36px; height: 36px; border-radius: 10px; cursor: pointer; transition: transform 0.2s ease; font-size: 15px; }
+      .btn-icon:hover { transform: translateY(-1px); }
+      .modal-body p { margin: 0 0 12px; color: var(--fg); font-size: 15px; line-height: 1.5; }
+      .modal-note { background: var(--bg); padding: 12px 16px; border-radius: var(--radius-md); font-style: italic; color: var(--muted); border-left: 3px solid var(--accent); margin: 0; font-size: 14px; }
+      .modal-footer { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-top: 1px solid var(--border); background: var(--bg); border-bottom-left-radius: var(--radius-lg); border-bottom-right-radius: var(--radius-lg); }
 
-      .gamification-dashboard .achievement-badge.unlocked {
-        opacity: 1;
-        border-color: var(--accent);
-        background: linear-gradient(to right, var(--bg), var(--card));
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      }
+      /* Toast */
+      .toast { position: fixed; bottom: 20px; right: 20px; background: var(--elevated); padding: 12px 16px; border-radius: 12px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); display: none; align-items: center; gap: 8px; font-weight: 700; z-index: 1000; }
 
-      .gamification-dashboard .achievement-badge-icon {
-        font-size: 16px;
-      }
+      /* Confetti */
+      .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 999; }
+      .confetti span { position: absolute; width: 8px; height: 14px; background: var(--accent); opacity: 0.8; animation: fall 1s ease-out forwards; }
+      @keyframes fall { to { transform: translateY(220px) rotate(240deg); opacity: 0; } }
 
-      .progress-section {
-        margin-top: 20px;
-      }
-
-      .progress-label {
-        display: flex;
-        justify-content: space-between;
-        font-size: 13px;
-        font-weight: 600;
-        margin-bottom: 6px;
-      }
-
-      .progress-track {
-        height: 8px;
-        background: var(--bg);
-        border-radius: 4px;
-        overflow: hidden;
-      }
-
-      .progress-fill {
-        height: 100%;
-        background: var(--accent);
-        width: 0%;
-        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .competition-line {
-        margin-top: 12px;
-        font-size: 13px;
-        color: var(--muted);
-        text-align: center;
-        width: 100%;
-      }
-
-      .gamification-toggle-label {
-        margin-top: 12px;
-        font-size: 13px;
-        color: var(--muted);
-      }
-
-      /* Exercise Modal */
-      .modal-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.2s ease, visibility 0.2s ease;
-        padding: 20px;
-      }
-
-      .modal-backdrop[aria-hidden="false"] {
-        opacity: 1;
-        visibility: visible;
-      }
-
-      .modal {
-        background: var(--card);
-        width: 100%;
-        max-width: 500px;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-lg);
-        display: flex;
-        flex-direction: column;
-        max-height: 90vh;
-        transform: scale(0.95);
-        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        border: 1px solid var(--border);
-      }
-
-      .modal-backdrop[aria-hidden="false"] .modal {
-        transform: scale(1);
-      }
-
-      .modal-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 16px 20px;
-        border-bottom: 1px solid var(--border);
-      }
-
-      .modal-header h2 {
-        margin: 0;
-        font-size: 18px;
-        font-weight: 700;
-        color: var(--fg);
-      }
-
-      .btn-icon {
-        background: transparent;
-        border: none;
-        color: var(--muted);
-        font-size: 20px;
-        cursor: pointer;
-        padding: 4px;
-        border-radius: 4px;
-        line-height: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
-      }
-
-      .btn-icon:hover {
-        background: var(--bg);
-        color: var(--fg);
-      }
-
-      .modal-body {
-        padding: 20px;
-        overflow-y: auto;
-      }
-
-      .modal-image {
-        width: 100%;
-        border-radius: var(--radius-md);
-        margin-bottom: 20px;
-        border: 1px solid var(--border);
-        display: block;
-      }
-
-      .modal-cues {
-        margin: 0 0 20px 0;
-        padding-left: 20px;
-      }
-
-      .modal-cues li {
-        margin-bottom: 8px;
-        color: var(--fg);
-        font-size: 15px;
-        line-height: 1.5;
-      }
-
-      .modal-note {
-        background: var(--bg);
-        padding: 12px 16px;
-        border-radius: var(--radius-md);
-        font-style: italic;
-        color: var(--muted);
-        border-left: 3px solid var(--accent);
-        margin: 0;
-        font-size: 14px;
-      }
-
-      .modal-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 16px 20px;
-        border-top: 1px solid var(--border);
-        background: var(--bg);
-        border-bottom-left-radius: var(--radius-lg);
-        border-bottom-right-radius: var(--radius-lg);
-      }
-
-      /* List Item with View Action */
-      .list-item-actionable {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: pointer;
-        padding: 6px 0;
-        width: 100%;
-      }
-
-      .list-item-actionable:hover .view-chip {
-        background: var(--fg);
-        color: var(--bg);
-        border-color: var(--fg);
-      }
-
-      .list-item-text {
-        flex: 1;
-        padding-right: 12px;
-      }
-
-      .view-chip {
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        background: var(--bg);
-        border: 1px solid var(--border);
-        color: var(--muted);
-        padding: 4px 10px;
-        border-radius: 99px;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        white-space: nowrap;
+      /* Mobile Responsive */
+      @media (max-width: 768px) {
+        .hero { gap: 12px; }
+        .hero-actions { width: 100%; justify-content: flex-start; }
+        .toolbar { grid-template-columns: 1fr; }
+        .weekly-progress { grid-template-columns: 1fr; }
+        .day-actions { width: 100%; }
+        .day-actions .btn { flex: 1; }
+        .day-card { padding: 18px 14px; }
+        .block-grid { grid-template-columns: 1fr; }
+        .today-strip { flex-direction: column; align-items: flex-start; }
       }
     </style>
+
   </head>
   <body>
     <!-- Modal Scaffold -->
@@ -775,73 +404,103 @@
       </div>
     </div>
 
-    <main>
-      <div class="top-bar">
-        <div>
-          <p class="muted">Family Training Hub</p>
-          <h1 class="title">Shared Plan Renderer</h1>
+        <main>
+      <div class="shell">
+        <div class="hero">
+          <div class="hero-left">
+            <div id="planAvatar" class="plan-avatar">🏃‍♂️</div>
+            <div class="title-stack">
+              <p class="muted">Family Training Hub</p>
+              <h1 id="planTitle"></h1>
+              <p id="planSubtitle" class="muted"></p>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <label class="toggle" for="themeToggle">
+              <input type="checkbox" id="themeToggle" />
+              <span class="switch"></span>
+              <span>Dark</span>
+            </label>
+            <button id="resetProgress" class="btn btn-outline">Reset week</button>
+          </div>
         </div>
-        <div class="controls">
-          <label class="toggle" for="themeToggle">
-            <input type="checkbox" id="themeToggle" />
-            <span class="muted">Dark mode</span>
+
+        <p id="planOverview" class="muted" style="margin: 10px 0 0;"></p>
+
+        <div class="today-strip">
+          <div>
+            <div class="today-title" id="todayLabel">Today: Day 1 · Let's get moving</div>
+            <div class="muted" id="todayMessage">Scroll to the session and press Start.</div>
+          </div>
+          <button id="startToday" class="btn btn-primary anchor-btn">Start</button>
+        </div>
+
+        <div class="weekly-progress" id="weeklyProgress">
+          <div class="stat">
+            <span class="muted">This week</span>
+            <strong id="weeklyCount">0 / 7 sessions</strong>
+            <span id="weeklyMessage" class="muted">Let's start easy.</span>
+          </div>
+          <div class="progress-track"><div id="weeklyBar" class="progress-fill"></div></div>
+        </div>
+
+        <div class="toolbar">
+          <div class="toolbar-card">
+            <div class="control-group">
+              <label for="planPicker">Plan</label>
+              <select id="planPicker"></select>
+            </div>
+          </div>
+          <div class="toolbar-card" id="weekPickerGroup">
+            <div class="control-group">
+              <label for="weekPicker">Week</label>
+              <select id="weekPicker"></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="day-chip-bar" id="dayChips"></div>
+
+        <!-- Gamification Dashboard -->
+        <section id="gamificationDashboard" class="gamification-dashboard">
+          <div class="scorecard-header">
+            <div class="scorecard-stats">
+              <div class="stat-item">
+                <span id="weeklyPoints" class="stat-value">0</span>
+                <span class="stat-label">This Week</span>
+              </div>
+              <div class="stat-item">
+                <span id="sessionsCompleted" class="stat-value">0/0</span>
+                <span class="stat-label">Sessions</span>
+              </div>
+            </div>
+            <div id="coachMessage" class="coach-message"></div>
+          </div>
+
+          <div class="progress-section">
+            <div class="progress-label">
+              <span>Training Blocks Completed</span>
+              <span id="totalPointsLabel">0 / 120 pts</span>
+            </div>
+            <div class="progress-track">
+              <div id="totalProgressBar" class="progress-fill"></div>
+            </div>
+          </div>
+
+          <div id="badgesContainer" class="badges-container"></div>
+
+          <div class="competition-line">
+             You vs You — Quality over quantity.
+          </div>
+
+           <label class="toggle gamification-toggle-label">
+              <input type="checkbox" id="gamificationToggle" checked />
+              <span class="muted">Show achievements</span>
           </label>
-          <div class="control-group">
-            <label for="planPicker">Choose plan</label>
-            <select id="planPicker"></select>
-          </div>
-          <div class="control-group" id="weekPickerGroup">
-            <label for="weekPicker">Choose week</label>
-            <select id="weekPicker"></select>
-          </div>
-        </div>
+        </section>
+
+        <section id="weeks" class="weeks"></section>
       </div>
-
-      <!-- Gamification Dashboard -->
-      <section id="gamificationDashboard" class="gamification-dashboard">
-        <div class="scorecard-header">
-          <div class="scorecard-stats">
-            <div class="stat-item">
-              <span id="weeklyPoints" class="stat-value">0</span>
-              <span class="stat-label">This Week</span>
-            </div>
-            <div class="stat-item">
-              <span id="sessionsCompleted" class="stat-value">0/0</span>
-              <span class="stat-label">Sessions</span>
-            </div>
-          </div>
-          <div id="coachMessage" class="coach-message"></div>
-        </div>
-
-        <div class="progress-section">
-          <div class="progress-label">
-            <span>Training Blocks Completed</span>
-            <span id="totalPointsLabel">0 / 120 pts</span>
-          </div>
-          <div class="progress-track">
-            <div id="totalProgressBar" class="progress-fill"></div>
-          </div>
-        </div>
-
-        <div id="badgesContainer" class="badges-container"></div>
-
-        <div class="competition-line">
-           You vs You — Quality over quantity.
-        </div>
-
-         <label class="toggle gamification-toggle-label">
-            <input type="checkbox" id="gamificationToggle" checked />
-            <span class="muted">Show achievements</span>
-        </label>
-      </section>
-
-      <section class="plan-header">
-        <h2 id="planTitle" class="plan-title"></h2>
-        <p id="planSubtitle" class="plan-subtitle"></p>
-        <p id="planOverview" class="muted"></p>
-      </section>
-
-      <section id="weeks" class="weeks"></section>
     </main>
 
     <script type="module">
@@ -860,9 +519,20 @@
       const planTitle = document.getElementById("planTitle");
       const planSubtitle = document.getElementById("planSubtitle");
       const planOverview = document.getElementById("planOverview");
+      const planAvatar = document.getElementById("planAvatar");
       const weekPicker = document.getElementById("weekPicker");
       const weekPickerGroup = document.getElementById("weekPickerGroup");
       const weeksContainer = document.getElementById("weeks");
+      const dayChips = document.getElementById("dayChips");
+      const startTodayBtn = document.getElementById("startToday");
+      const resetProgressBtn = document.getElementById("resetProgress");
+      const todayLabel = document.getElementById("todayLabel");
+      const todayMessage = document.getElementById("todayMessage");
+      const weeklyCountEl = document.getElementById("weeklyCount");
+      const weeklyBarEl = document.getElementById("weeklyBar");
+      const weeklyMessageEl = document.getElementById("weeklyMessage");
+      const toastEl = document.getElementById("toast");
+      const confettiEl = document.getElementById("confetti");
 
       // Gamification Elements
       const gamificationDashboard = document.getElementById("gamificationDashboard");
@@ -879,6 +549,7 @@
       let normalizedPlan;
       let selectedWeekId;
       let progressState;
+      let todayTargetId = null;
 
       initTheme();
 
@@ -1195,36 +866,35 @@
           const exercise = (exKey && currentPlan.exercises) ? currentPlan.exercises[exKey] : null;
 
           if (exercise) {
-              const div = document.createElement("div");
-              div.className = "list-item-actionable";
-              div.setAttribute("role", "button");
-              div.setAttribute("tabindex", "0");
-              div.setAttribute("aria-label", `View details for ${text}`);
+            li.className = "exercise-row actionable";
+            li.setAttribute("role", "button");
+            li.setAttribute("tabindex", "0");
+            li.setAttribute("aria-label", `View details for ${text}`);
 
-              div.onclick = (e) => {
-                  e.stopPropagation();
-                  openExerciseModal(exKey, e.currentTarget);
-              };
-              div.onkeydown = (e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      openExerciseModal(exKey, e.currentTarget);
-                  }
-              };
+            const spanText = document.createElement("span");
+            spanText.textContent = text;
+            spanText.style.fontWeight = "600";
 
-              const spanText = document.createElement("span");
-              spanText.className = "list-item-text";
-              spanText.textContent = text;
-              spanText.style.fontWeight = "600";
+            const btnView = document.createElement("span");
+            btnView.className = "view-chip";
+            btnView.innerHTML = `👁 Details`;
 
-              const btnView = document.createElement("span");
-              btnView.className = "view-chip";
-              btnView.innerHTML = `View`;
+            li.append(spanText, btnView);
 
-              div.append(spanText, btnView);
-              li.append(div);
+            const open = () => openExerciseModal(exKey, li);
+            li.onclick = (e) => {
+              e.stopPropagation();
+              open();
+            };
+            li.onkeydown = (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                open();
+              }
+            };
           } else {
-              li.textContent = text;
+            li.className = "exercise-row";
+            li.textContent = text;
           }
 
           listEl.append(li);
@@ -1240,7 +910,6 @@
             const weekNum = parseInt(selectedWeekId.replace('week-', ''));
             const view = resolvePlanForWeek(currentPlan, weekNum);
 
-            // Construct a view object compatible with the renderer
             displayData = {
                 meta: view.meta,
                 overview: normalizedPlan.overview,
@@ -1252,16 +921,19 @@
             };
         }
 
-        planTitle.textContent = displayData.meta?.name || "";
+        const planName = displayData.meta?.name || "";
+        planTitle.textContent = planName;
         planSubtitle.textContent = displayData.meta?.subtitle || "";
         planSubtitle.style.display = displayData.meta?.subtitle ? "block" : "none";
         planOverview.textContent = displayData.overview || "";
         planOverview.style.display = displayData.overview ? "block" : "none";
+        planAvatar.textContent = displayData.meta?.emoji || (planName ? planName.charAt(0) : '🏃');
 
         // Update Gamification
         updateGamification();
 
         weeksContainer.innerHTML = "";
+        dayChips.innerHTML = "";
         const weeks = displayData.weeks || [];
         const activeWeek = weeks.find((week) => week.id === selectedWeekId) || weeks[0];
         if (!activeWeek) return;
@@ -1275,13 +947,89 @@
         weekCard.append(title);
 
         const days = activeWeek.days || [];
+        const dayTargets = [];
+        let firstOpenTarget = null;
+
+        const completedCount = (progressState?.completed || []).length;
+        const totalCount = days.length || 1;
+        weeklyCountEl.textContent = `${completedCount} / ${totalCount} sessions`;
+        const completionRatio = Math.min(100, Math.round((completedCount / totalCount) * 100));
+        weeklyBarEl.style.width = `${completionRatio}%`;
+        let coachLine = "Let's start easy.";
+        if (completedCount >= 7) coachLine = "Perfect week!";
+        else if (completedCount >= 4) coachLine = "Strong week.";
+        else if (completedCount >= 1) coachLine = "Nice momentum.";
+        weeklyMessageEl.textContent = coachLine;
+
         days.forEach((day, idx) => {
+          const dayId = day.id || day.day || day.name || `day-${idx + 1}`;
+          const dayDomId = `day-${idx + 1}`;
+          const status = progressState?.completed?.includes(dayId)
+            ? "Done"
+            : progressState?.skipped?.includes(dayId)
+              ? "Skipped"
+              : "";
+
+          const focusLabel = day.focus || day.tag || day.name || `Day ${idx + 1}`;
+
+          const chip = document.createElement("div");
+          chip.className = "day-chip";
+          chip.dataset.target = dayDomId;
+          const dot = document.createElement("span");
+          dot.className = `status-dot ${status ? status.toLowerCase() : ""}`;
+          const top = document.createElement("div");
+          top.className = "chip-top";
+          top.innerHTML = `<span>Day ${idx + 1}</span>`;
+          top.append(dot);
+          const focus = document.createElement("div");
+          focus.className = "chip-focus";
+          focus.textContent = focusLabel;
+          chip.append(top, focus);
+          chip.onclick = () => {
+            const target = document.getElementById(dayDomId);
+            if (target) {
+              target.scrollIntoView({ behavior: "smooth", block: "start" });
+              highlightActiveChip(dayDomId);
+            }
+          };
+          dayChips.append(chip);
+
+          if (!status && !firstOpenTarget) firstOpenTarget = dayDomId;
+          dayTargets.push({ domId: dayDomId, chip });
+        });
+
+        todayTargetId = firstOpenTarget || (dayTargets[dayTargets.length - 1]?.domId || null);
+        const todayDay = dayTargets.find(({ domId }) => domId === todayTargetId) || dayTargets[0];
+        if (todayDay) {
+          const idx = dayTargets.indexOf(todayDay);
+          const focus = days[idx]?.focus || days[idx]?.name || `Day ${idx + 1}`;
+          todayLabel.textContent = `Today: Day ${idx + 1} · ${focus}`;
+          todayMessage.textContent = coachLine;
+          highlightActiveChip(todayDay.domId);
+        }
+
+        const iconFor = (title = "") => {
+          const t = title.toLowerCase();
+          if (t.includes("warm")) return "🔥";
+          if (t.includes("main") || t.includes("strength")) return "💪";
+          if (t.includes("skill") || t.includes("focus")) return "🎯";
+          if (t.includes("cool") || t.includes("finish") || t.includes("stretch")) return "🧊";
+          return "🏃";
+        };
+
+        days.forEach((day, idx) => {
+          const dayId = day.id || day.day || day.name || `day-${idx + 1}`;
+          const dayDomId = `day-${idx + 1}`;
+          const dayName = day.name || day.day || `Day ${idx + 1}`;
+          const status = progressState?.completed?.includes(dayId)
+            ? "Done"
+            : progressState?.skipped?.includes(dayId)
+              ? "Skipped"
+              : "Planned";
+
           const dayEl = document.createElement("article");
           dayEl.className = "day-card";
-
-          // LEFT RAIL (Meta)
-          const metaEl = document.createElement("div");
-          metaEl.className = "day-meta";
+          dayEl.id = dayDomId;
 
           // Collect Exercise Keys for Context
           const dayExKeys = [];
@@ -1300,49 +1048,60 @@
               dayEl.dataset.exkeys = dayExKeys.join('|');
           }
 
-          const header = document.createElement("header");
+          const header = document.createElement("div");
           header.className = "day-header";
 
           const nameEl = document.createElement("h4");
-          nameEl.className = "day-name";
-          const dayName = day.name || day.day || "Session";
+          nameEl.className = "day-title";
           nameEl.textContent = dayName;
 
-          header.append(nameEl);
+          const metaRow = document.createElement("div");
+          metaRow.className = "day-meta-row";
+          if (day.focus) {
+            const focusPill = document.createElement("span");
+            focusPill.className = "pill";
+            focusPill.textContent = day.focus;
+            metaRow.append(focusPill);
+          }
+          const statusPill = document.createElement("span");
+          statusPill.className = `pill ${status.toLowerCase()}`;
+          statusPill.textContent = status;
+          metaRow.append(statusPill);
 
+          header.append(nameEl, metaRow);
+          dayEl.append(header);
+
+          const variationRow = document.createElement("div");
+          variationRow.className = "variation-row";
           const dayTag = day.tag || day.tagTemplate;
-          const dayId = day.id || day.day || day.name || `day-${idx + 1}`;
-          const status = progressState?.completed?.includes(dayId)
-            ? "Done"
-            : progressState?.skipped?.includes(dayId)
-              ? "Skipped"
-              : "";
-
-          // Status Badge
-          if (dayTag || status) {
-            const tagEl = document.createElement("div");
-            tagEl.className = "day-tags";
-
-            if (dayTag) {
-                const badge = document.createElement("span");
-                badge.className = "badge badge-tag";
-                badge.textContent = dayTag;
-                tagEl.append(badge);
-            }
-            if (status) {
-                 const badge = document.createElement("span");
-                badge.className = `badge badge-status-${status.toLowerCase()}`;
-                badge.textContent = status;
-                tagEl.append(badge);
-            }
-            header.append(tagEl);
+          if (dayTag) {
+            const tagChip = document.createElement("span");
+            tagChip.className = "chip";
+            tagChip.textContent = dayTag;
+            variationRow.append(tagChip);
+          }
+          if (day.base) {
+            const baseChip = document.createElement("span");
+            baseChip.className = "chip";
+            baseChip.textContent = day.base;
+            variationRow.append(baseChip);
+          }
+          if (variationRow.children.length) {
+            dayEl.append(variationRow);
           }
 
-          metaEl.append(header);
-
-          // CONTENT SECTION
-          const contentEl = document.createElement("div");
-          contentEl.className = "day-content";
+          const progressRow = document.createElement("div");
+          progressRow.className = "day-progress";
+          const track = document.createElement("div");
+          track.className = "progress-track";
+          const fill = document.createElement("div");
+          fill.className = "progress-fill";
+          fill.style.width = status === 'Done' ? '100%' : status === 'Skipped' ? '40%' : '20%';
+          track.append(fill);
+          const small = document.createElement("small");
+          small.textContent = status === 'Planned' ? 'Ready' : status;
+          progressRow.append(track, small);
+          dayEl.append(progressRow);
 
           if (day.focus) {
             const focus = document.createElement("div");
@@ -1353,8 +1112,11 @@
             const text = document.createElement("p");
             text.textContent = day.focus;
             focus.append(label, text);
-            contentEl.append(focus);
+            dayEl.append(focus);
           }
+
+          const contentEl = document.createElement("div");
+          contentEl.className = "block-grid";
 
           if (Array.isArray(day.blocks) && day.blocks.length) {
             day.blocks.forEach((block) => {
@@ -1362,20 +1124,21 @@
               blockWrapper.className = "exercise-block";
 
               if (typeof block === "string") {
-                const list = document.createElement("ul");
-                const li = document.createElement("li");
-                li.textContent = block;
-                list.append(li);
-                blockWrapper.append(list);
+                const titleEl = document.createElement("h5");
+                titleEl.className = "block-title";
+                titleEl.innerHTML = `<span class="block-icon">🏃</span>${block}`;
+                blockWrapper.append(titleEl);
                 contentEl.append(blockWrapper);
                 return;
               }
 
               if (block && typeof block === "object") {
-                 if (block.title) {
+                 if (block.title || block.time) {
                   const titleEl = document.createElement("h5");
                   titleEl.className = "block-title";
-                  titleEl.textContent = block.title;
+                  const baseTitle = block.title || "Session";
+                  const label = block.time ? `${baseTitle} · ${block.time}` : baseTitle;
+                  titleEl.innerHTML = `<span class="block-icon">${iconFor(baseTitle)}</span>${label}`;
                   blockWrapper.append(titleEl);
                 }
 
@@ -1390,14 +1153,18 @@
             });
           }
 
-          // Controls moved to Meta in Left Rail
+          if (contentEl.children.length) {
+            dayEl.append(contentEl);
+          }
+
           const actionBar = document.createElement("div");
           actionBar.className = "day-actions";
 
           const doneBtn = document.createElement("button");
           doneBtn.className = "btn btn-primary";
-          doneBtn.textContent = "Complete";
+          doneBtn.textContent = status === 'Done' ? 'Completed' : 'Mark done';
           doneBtn.setAttribute("aria-label", `Mark ${dayName} as done`);
+          doneBtn.disabled = status === 'Done';
           doneBtn.onclick = () => {
             setDayStatus(dayId, "done");
             if (currentPlan.meta.id === 'isla') {
@@ -1406,33 +1173,63 @@
           };
 
           const skipBtn = document.createElement("button");
-          skipBtn.className = "btn btn-ghost";
-          skipBtn.textContent = "Skip";
+          skipBtn.className = "btn btn-outline";
+          skipBtn.textContent = status === 'Skipped' ? 'Missed' : 'Missed';
           skipBtn.setAttribute("aria-label", `Skip ${dayName}`);
+          skipBtn.disabled = status === 'Skipped';
           skipBtn.onclick = () => {
             setDayStatus(dayId, "skipped");
           };
 
+          const clearBtn = document.createElement("button");
+          clearBtn.className = "btn btn-ghost";
+          clearBtn.textContent = "Clear";
+          clearBtn.onclick = () => setDayStatus(dayId, "clear");
+
+          actionBar.append(doneBtn, skipBtn, clearBtn);
+          dayEl.append(actionBar);
+
           if (status === "Done") {
-            doneBtn.disabled = true;
-            doneBtn.textContent = "Completed";
             dayEl.classList.add("is-complete");
           }
 
           if (status === "Skipped") {
-            skipBtn.disabled = true;
-            skipBtn.textContent = "Skipped";
              dayEl.classList.add("is-skipped");
           }
 
-          actionBar.append(doneBtn, skipBtn);
-          metaEl.append(actionBar);
-
-          dayEl.append(metaEl, contentEl);
           weekCard.append(dayEl);
         });
 
         weeksContainer.append(weekCard);
+      }
+
+      function showToast(message) {
+        if (!toastEl) return;
+        toastEl.textContent = message;
+        toastEl.style.display = "flex";
+        setTimeout(() => {
+          toastEl.style.display = "none";
+        }, 1600);
+      }
+
+      function triggerConfetti() {
+        if (!confettiEl) return;
+        confettiEl.innerHTML = "";
+        for (let i = 0; i < 18; i++) {
+          const piece = document.createElement("span");
+          piece.style.left = `${Math.random() * 100}%`;
+          piece.style.top = `${Math.random() * 10}%`;
+          piece.style.background = i % 2 === 0 ? "#5b7bff" : "#f59e0b";
+          piece.style.animationDelay = `${Math.random() * 0.2}s`;
+          confettiEl.append(piece);
+        }
+        setTimeout(() => { confettiEl.innerHTML = ""; }, 1200);
+      }
+
+      function highlightActiveChip(domId) {
+        document.querySelectorAll('.day-chip').forEach((chip) => {
+          chip.classList.toggle('active', chip.dataset.target === domId);
+        });
       }
 
       function setDayStatus(dayId, status) {
@@ -1457,6 +1254,17 @@
 
         saveProgress(currentPlanId, selectedWeekId, progressState);
         renderPlan();
+
+        if (status === "done") {
+          showToast("Nice work ✅");
+          if (currentPlan.meta.id === "isla") {
+            triggerConfetti();
+          }
+        } else if (status === "skipped") {
+          showToast("Marked as missed");
+        } else {
+          showToast("Cleared status");
+        }
       }
 
       function setActiveWeek(weekId) {
@@ -1464,6 +1272,26 @@
         progressState = loadProgress(currentPlanId, selectedWeekId);
         localStorage.setItem(storageWeekKey(currentPlanId), selectedWeekId);
         renderPlan();
+      }
+
+      if (startTodayBtn) {
+        startTodayBtn.onclick = () => {
+          if (!todayTargetId) return;
+          const target = document.getElementById(todayTargetId);
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+            highlightActiveChip(todayTargetId);
+          }
+        };
+      }
+
+      if (resetProgressBtn) {
+        resetProgressBtn.onclick = () => {
+          progressState = { completed: [], skipped: [] };
+          saveProgress(currentPlanId, selectedWeekId, progressState);
+          renderPlan();
+          showToast("Week reset");
+        };
       }
 
       function setActivePlan(planId) {

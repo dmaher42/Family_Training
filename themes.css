@@ -1,17 +1,29 @@
 :root {
-  --bg: #f3f5fb;
+  --bg: radial-gradient(circle at 10% 20%, #f7fbff, #eef2ff 30%, #f5f5ff 60%, #eef4fb);
   --fg: #0f172a;
-  --card: #ffffff;
-  --muted: #5b6b7a;
-  --accent: #5c7cff;
-  --border: #e1e7f0;
+  --card: #ffffffcc;
+  --muted: #516072;
+  --accent: #5b7bff;
+  --accent-strong: #3b5bff;
+  --border: #dfe6f3;
+  --elevated: #ffffff;
+  --shadow-soft: 0 10px 40px rgb(53 85 146 / 0.12);
+  --shadow-strong: 0 18px 48px rgb(35 53 109 / 0.18);
+  --texture: radial-gradient(circle at 20% 20%, rgba(91, 123, 255, 0.05), transparent 25%),
+    radial-gradient(circle at 80% 0%, rgba(255, 179, 71, 0.06), transparent 28%);
 }
 
 [data-theme="dark"] {
-  --bg: #0b1220;
+  --bg: radial-gradient(circle at 0% 20%, #0f172a, #0b1220 40%, #0c1224 70%, #0b111f);
   --fg: #e6edf7;
-  --card: #111a2e;
-  --muted: #9baac0;
+  --card: #0f172acc;
+  --muted: #9da8bd;
   --accent: #7fa1ff;
+  --accent-strong: #97b2ff;
   --border: #1f2c44;
+  --elevated: #141f35;
+  --shadow-soft: 0 10px 40px rgb(0 0 0 / 0.32);
+  --shadow-strong: 0 18px 48px rgb(0 0 0 / 0.4);
+  --texture: radial-gradient(circle at 20% 20%, rgba(127, 161, 255, 0.12), transparent 28%),
+    radial-gradient(circle at 80% 0%, rgba(255, 179, 71, 0.1), transparent 30%);
 }
