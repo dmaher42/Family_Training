@@ -645,10 +645,10 @@
 
       // Badges Definition
       const BADGES = [
-        { id: "first_week", label: "First Week Done", icon: "🟢", check: (stats) => stats.weeksCompleted >= 1 },
+        { id: "first_week", label: "First Week Completed", icon: "🟢", check: (stats) => stats.weeksCompleted >= 1 },
         { id: "three_weeks", label: "3 Weeks Consistent", icon: "🔵", check: (stats) => stats.weeksCompleted >= 3 },
-        { id: "strength_master", label: "All Strength Days", icon: "🟣", check: (stats) => stats.strengthDays >= 12 }, // e.g. 1 per week
-        { id: "recovery_pro", label: "Recovery Matters", icon: "🟡", check: (stats) => stats.restDaysTaken >= 1 }
+        { id: "strength_focus", label: "Strength Focus", icon: "🟣", check: (stats) => stats.hasPerfectStrengthWeek },
+        { id: "recovery_matters", label: "Recovery Matters", icon: "🟡", check: (stats) => stats.restDaysTaken >= 1 }
       ];
 
       function getDefaultPlanId() {
@@ -934,14 +934,15 @@
       // --- Gamification Logic ---
 
       function updateGamification() {
-        const isIsla = currentPlanId === "isla";
+        // Detect Isla plan
+        const isIslaPlan = currentPlan?.meta?.id === "isla";
         const storedToggle = localStorage.getItem(GAMIFY_TOGGLE_KEY);
         const isEnabled = storedToggle !== "false"; // Default true
 
         // Update toggle UI state
         gamificationToggle.checked = isEnabled;
 
-        if (!isIsla || !isEnabled) {
+        if (!isIslaPlan || !isEnabled) {
             gamificationDashboard.style.display = "none";
             return;
         }
@@ -963,7 +964,7 @@
         let weekSessionsDone = 0;
         let weekSessionsTotal = 0;
         let weeksCompleted = 0;
-        let strengthDays = 0;
+        let hasPerfectStrengthWeek = false;
         let restDaysTaken = 0;
 
         normalizedPlan.weeks.forEach(week => {
@@ -972,7 +973,12 @@
              let weekPoints = 0;
              let weekDoneCount = 0;
              let weekPlanCount = week.days.length;
-             let weekStrengthCount = 0;
+
+             // Count strength days in this week to check for "Strength Focus"
+             // Isla's plan: Strength is Day 1 and Day 4.
+             // We check if all days with focus "Strength..." are done.
+             let weekStrengthTotal = 0;
+             let weekStrengthDone = 0;
 
              week.days.forEach((day, idx) => {
                  // Identify Rest Day
@@ -980,23 +986,31 @@
                  const dayId = day.id || day.day || day.name || `day-${idx + 1}`;
                  const isDone = progress.completed.includes(dayId);
 
+                 const isStrength = day.focus && day.focus.includes("Strength");
+
+                 if (isStrength) {
+                    weekStrengthTotal++;
+                 }
+
                  if (isDone) {
                      if (isRest) {
                          weekPoints += 5;
                          restDaysTaken++;
                      } else {
                          weekPoints += 10;
-                         weekStrengthCount++;
-                         // Note: Simply counting non-rest days as strength/effort for simplicity
-                         // unless specific "focus" check is needed.
-                         // Prompt says: "All Strength Days Completed" - let's check focus "Strength"
-                         if (day.focus && day.focus.includes("Strength")) {
-                             strengthDays++;
-                         }
                      }
+
+                     if (isStrength) {
+                        weekStrengthDone++;
+                     }
+
                      weekDoneCount++;
                  }
              });
+
+             if (weekStrengthTotal > 0 && weekStrengthDone === weekStrengthTotal) {
+                hasPerfectStrengthWeek = true;
+             }
 
              totalPoints += weekPoints;
 
@@ -1007,13 +1021,17 @@
                  weekSessionsTotal = weekPlanCount;
              }
 
-             // Heuristic for "Week Completed": > 70% days done? Or just non-zero points?
-             // Prompt: "First Week Done".
-             // Let's assume > 30 points (approx 3 days) counts as a "completed week" contextually for badges.
-             if (weekPoints >= 30) {
+             // Prompt: "First Week Completed".
+             // We use >= 40 points as a heuristic for a "completed" training week.
+             if (weekPoints >= 40) {
                  weeksCompleted++;
              }
         });
+
+        // Persist points as requested
+        if (currentPlanId === "isla") {
+            localStorage.setItem("points_v1:isla", totalPoints);
+        }
 
         return {
             totalPoints,
@@ -1021,7 +1039,7 @@
             weekSessionsDone,
             weekSessionsTotal,
             weeksCompleted,
-            strengthDays,
+            hasPerfectStrengthWeek,
             restDaysTaken
         };
       }
@@ -1045,8 +1063,8 @@
           // If Isla does 4 sessions/week = 40 pts.
           // 12 weeks * 40 pts = 480 pts.
           // Maybe the prompt meant "120 points" as an arbitrary example.
-          // Let's set the goal to 500 (approx 12 weeks * 40pts).
-          const GOAL_POINTS = 500;
+          // Goal: 120 points (Season progress)
+          const GOAL_POINTS = 120;
           const percentage = Math.min((stats.totalPoints / GOAL_POINTS) * 100, 100);
           totalProgressBar.style.width = `${percentage}%`;
           totalPointsLabel.textContent = `${stats.totalPoints} / ${GOAL_POINTS} pts`;
