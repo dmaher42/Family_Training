@@ -569,6 +569,7 @@
       const btnBonusSharp = document.getElementById("btnBonusSharp");
       const btnBonusFocus = document.getElementById("btnBonusFocus");
       const btnBonusSkip = document.getElementById("btnBonusSkip");
+      let coachBonusLastFocused = null;
       let pendingBonusDayId = null;
 
       let modalState = {
@@ -742,20 +743,23 @@
       // --- Coach Bonus Logic ---
       function openCoachBonusModal(dayId) {
           pendingBonusDayId = dayId;
+          coachBonusLastFocused = document.activeElement;
           coachBonusModalBackdrop.hidden = false;
-          requestAnimationFrame(() => {
-              coachBonusModalBackdrop.setAttribute("aria-hidden", "false");
-          });
+          coachBonusModalBackdrop.setAttribute("aria-hidden", "false");
           btnBonusSharp.focus();
       }
 
       function closeCoachBonusModal() {
+          if (coachBonusLastFocused && typeof coachBonusLastFocused.focus === "function") {
+              coachBonusLastFocused.focus();
+          }
           coachBonusModalBackdrop.setAttribute("aria-hidden", "true");
           setTimeout(() => {
              if (coachBonusModalBackdrop.getAttribute("aria-hidden") === "true") {
                 coachBonusModalBackdrop.hidden = true;
              }
           }, 200);
+          coachBonusLastFocused = null;
           pendingBonusDayId = null;
       }
 
