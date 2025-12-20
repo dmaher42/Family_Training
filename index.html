@@ -524,84 +524,170 @@
         color: var(--muted);
       }
 
-      /* Exercise Media & Details */
-      .exercise-details summary {
-        cursor: pointer;
-        list-style: none; /* Hide default triangle */
+      /* Exercise Modal */
+      .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1000;
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease, visibility 0.2s ease;
+        padding: 20px;
       }
 
-      .exercise-details summary::-webkit-details-marker {
-        display: none;
+      .modal-backdrop[aria-hidden="false"] {
+        opacity: 1;
+        visibility: visible;
       }
 
-      .exercise-details summary:hover .view-btn {
-        background: var(--border);
+      .modal {
+        background: var(--card);
+        width: 100%;
+        max-width: 500px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+        transform: scale(0.95);
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 1px solid var(--border);
+      }
+
+      .modal-backdrop[aria-hidden="false"] .modal {
+        transform: scale(1);
+      }
+
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .modal-header h2 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
         color: var(--fg);
       }
 
-      .view-btn {
-        font-size: 10px;
+      .btn-icon {
+        background: transparent;
+        border: none;
+        color: var(--muted);
+        font-size: 20px;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+      }
+
+      .btn-icon:hover {
+        background: var(--bg);
+        color: var(--fg);
+      }
+
+      .modal-body {
+        padding: 20px;
+        overflow-y: auto;
+      }
+
+      .modal-image {
+        width: 100%;
+        border-radius: var(--radius-md);
+        margin-bottom: 20px;
+        border: 1px solid var(--border);
+        display: block;
+      }
+
+      .modal-cues {
+        margin: 0 0 20px 0;
+        padding-left: 20px;
+      }
+
+      .modal-cues li {
+        margin-bottom: 8px;
+        color: var(--fg);
+        font-size: 15px;
+        line-height: 1.5;
+      }
+
+      .modal-note {
+        background: var(--bg);
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        font-style: italic;
+        color: var(--muted);
+        border-left: 3px solid var(--accent);
+        margin: 0;
+        font-size: 14px;
+      }
+
+      /* List Item with View Action */
+      .list-item-actionable {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        padding: 6px 0;
+        width: 100%;
+      }
+
+      .list-item-actionable:hover .view-chip {
+        background: var(--fg);
+        color: var(--bg);
+        border-color: var(--fg);
+      }
+
+      .list-item-text {
+        flex: 1;
+        padding-right: 12px;
+      }
+
+      .view-chip {
+        font-size: 11px;
+        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         background: var(--bg);
         border: 1px solid var(--border);
-        padding: 2px 6px;
-        border-radius: 4px;
         color: var(--muted);
-        font-weight: 600;
-        margin-left: 8px;
+        padding: 4px 10px;
+        border-radius: 99px;
         transition: all 0.2s ease;
-      }
-
-      .exercise-details[open] .view-btn {
-        background: var(--fg);
-        color: var(--bg);
-        border-color: var(--fg);
-        content: "Hide";
-      }
-
-      .exercise-media {
-        margin-top: 12px;
-        background: var(--bg);
-        border-radius: var(--radius-sm);
-        padding: 12px;
-        border: 1px solid var(--border);
-        animation: fadeIn 0.2s ease-out;
-      }
-
-      .exercise-media img {
-        max-width: 100%;
-        border-radius: var(--radius-sm);
-        margin-bottom: 12px;
-        display: block;
-      }
-
-      .cues-list {
-        margin: 0 0 12px 0;
-        padding-left: 18px;
-      }
-
-      .cues-list li {
-        font-size: 14px;
-        margin-bottom: 4px;
-        color: var(--fg);
-      }
-
-      .exercise-note {
-        font-size: 13px;
-        font-style: italic;
-        color: var(--muted);
-        margin: 0;
-        background: var(--card);
-        padding: 8px;
-        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
       }
     </style>
   </head>
   <body>
+    <!-- Modal Scaffold -->
+    <div class="modal-backdrop" id="exerciseModalBackdrop" role="dialog" aria-modal="true" aria-hidden="true" hidden>
+      <div class="modal" role="document">
+        <div class="modal-header">
+          <h2 id="exerciseModalTitle"></h2>
+          <button id="exerciseModalClose" aria-label="Close" class="btn-icon">✕</button>
+        </div>
+        <div class="modal-body" id="exerciseModalBody"></div>
+      </div>
+    </div>
+
     <main>
       <div class="top-bar">
         <div>
@@ -709,6 +795,116 @@
 
       initTheme();
 
+      // --- Exercise Modal Logic ---
+      const exerciseModalBackdrop = document.getElementById("exerciseModalBackdrop");
+      const exerciseModalTitle = document.getElementById("exerciseModalTitle");
+      const exerciseModalBody = document.getElementById("exerciseModalBody");
+      const exerciseModalClose = document.getElementById("exerciseModalClose");
+      let lastFocusedElement = null;
+
+      function openExerciseModal(exKey) {
+          const exercise = currentPlan.exercises?.[exKey];
+          if (!exercise) return;
+
+          lastFocusedElement = document.activeElement;
+          exerciseModalTitle.textContent = exKey;
+          exerciseModalBody.innerHTML = "";
+
+          // Image
+          if (exercise.img) {
+              const img = document.createElement("img");
+              img.src = exercise.img;
+              img.alt = exKey;
+              img.className = "modal-image";
+              img.onerror = () => {
+                   img.style.display = 'none';
+                   const err = document.createElement("div");
+                   err.textContent = `Add image: ${exercise.img}`;
+                   err.style.color = "var(--muted)";
+                   err.style.fontSize = "12px";
+                   err.style.marginBottom = "10px";
+                   exerciseModalBody.insertBefore(err, exerciseModalBody.firstChild);
+              };
+              exerciseModalBody.append(img);
+          }
+
+          // Cues
+          if (exercise.cues && exercise.cues.length) {
+              const ul = document.createElement("ul");
+              ul.className = "modal-cues";
+              exercise.cues.forEach(cue => {
+                  const li = document.createElement("li");
+                  li.textContent = cue;
+                  ul.append(li);
+              });
+              exerciseModalBody.append(ul);
+          }
+
+          // Note
+          if (exercise.note) {
+              const note = document.createElement("p");
+              note.className = "modal-note";
+              note.textContent = exercise.note;
+              exerciseModalBody.append(note);
+          }
+
+          // Show
+          exerciseModalBackdrop.hidden = false;
+          // Trigger reflow/wait for next frame for transition
+          requestAnimationFrame(() => {
+              exerciseModalBackdrop.setAttribute("aria-hidden", "false");
+          });
+
+          document.body.style.overflow = "hidden";
+          exerciseModalClose.focus();
+      }
+
+      function closeExerciseModal() {
+          exerciseModalBackdrop.setAttribute("aria-hidden", "true");
+          document.body.style.overflow = "";
+
+          setTimeout(() => {
+              if (exerciseModalBackdrop.getAttribute("aria-hidden") === "true") {
+                  exerciseModalBackdrop.hidden = true;
+              }
+          }, 200);
+
+          if (lastFocusedElement) {
+              lastFocusedElement.focus();
+          }
+      }
+
+      // Modal Listeners
+      exerciseModalClose.addEventListener("click", closeExerciseModal);
+      exerciseModalBackdrop.addEventListener("click", (e) => {
+          if (e.target === exerciseModalBackdrop) closeExerciseModal();
+      });
+      document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && exerciseModalBackdrop.getAttribute("aria-hidden") === "false") {
+              closeExerciseModal();
+          }
+           if (e.key === "Tab" && exerciseModalBackdrop.getAttribute("aria-hidden") === "false") {
+               // Simple Focus Trap
+                const focusable = exerciseModalBackdrop.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                if (focusable.length === 0) return;
+
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+
+                if (e.shiftKey) {
+                    if (document.activeElement === first) {
+                        last.focus();
+                        e.preventDefault();
+                    }
+                } else {
+                    if (document.activeElement === last) {
+                        first.focus();
+                        e.preventDefault();
+                    }
+                }
+           }
+      });
+
       // Coach messages
       const COACH_MESSAGES = [
         "Strong week. Consistency beats everything.",
@@ -797,53 +993,34 @@
           const exercise = (exKey && currentPlan.exercises) ? currentPlan.exercises[exKey] : null;
 
           if (exercise) {
-              const details = document.createElement("details");
-              details.className = "exercise-details";
+              const div = document.createElement("div");
+              div.className = "list-item-actionable";
+              div.setAttribute("role", "button");
+              div.setAttribute("tabindex", "0");
+              div.setAttribute("aria-label", `View details for ${text}`);
 
-              const summary = document.createElement("summary");
-              // Using innerHTML safely for structure
+              div.onclick = (e) => {
+                  e.stopPropagation();
+                  openExerciseModal(exKey);
+              };
+              div.onkeydown = (e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      openExerciseModal(exKey);
+                  }
+              };
+
               const spanText = document.createElement("span");
+              spanText.className = "list-item-text";
               spanText.textContent = text;
-              // Make text bold as per requirements ("strong label")
               spanText.style.fontWeight = "600";
 
               const btnView = document.createElement("span");
-              btnView.className = "view-btn";
-              btnView.textContent = "View";
+              btnView.className = "view-chip";
+              btnView.innerHTML = `View`;
 
-              summary.append(spanText, btnView);
-
-              const content = document.createElement("div");
-              content.className = "exercise-media";
-
-              if (exercise.img) {
-                  const img = document.createElement("img");
-                  img.src = exercise.img;
-                  img.alt = exKey;
-                  img.loading = "lazy";
-                  content.append(img);
-              }
-
-              if (exercise.cues && exercise.cues.length) {
-                  const cuesList = document.createElement("ul");
-                  cuesList.className = "cues-list";
-                  exercise.cues.forEach(cue => {
-                      const cueLi = document.createElement("li");
-                      cueLi.textContent = cue;
-                      cuesList.append(cueLi);
-                  });
-                  content.append(cuesList);
-              }
-
-              if (exercise.note) {
-                  const note = document.createElement("p");
-                  note.className = "exercise-note";
-                  note.textContent = `💡 ${exercise.note}`;
-                  content.append(note);
-              }
-
-              details.append(summary, content);
-              li.append(details);
+              div.append(spanText, btnView);
+              li.append(div);
           } else {
               li.textContent = text;
           }
