@@ -114,23 +114,48 @@ export function resolvePlanForWeek(plan, weekNumber, opts = {}) {
 
           (block.items || []).forEach(item => {
               if (item.text) {
-                  items.push(interpolate(item.text, ctx));
+                  // Standard text item
+                  items.push({
+                      text: interpolate(item.text, ctx),
+                      exKey: item.exKey // Preserve if present
+                  });
               } else if (item.ref) {
                   // e.g. { ref: "squatVar" }
-                  // Look up in ctx
                   const val = ctx[item.ref];
+                  let resolvedText = "";
+
                   if (val) {
-                      items.push(interpolate(val, ctx));
+                      resolvedText = interpolate(val, ctx);
                   } else {
-                      items.push(`{${item.ref}}`);
+                       // Unresolved: format as TODO
+                      resolvedText = `TODO: ${item.ref}`;
                   }
+
+                  // exKey resolution for Refs
+                  // Rule: if ref ends with "Var", try to find base key in plan.exerciseKeys
+                  let exKey = undefined;
+                  if (item.ref.endsWith("Var") && plan.exerciseKeys) {
+                      const baseKey = item.ref.replace("Var", "");
+                      if (plan.exerciseKeys[baseKey]) {
+                          exKey = plan.exerciseKeys[baseKey];
+                      }
+                  }
+
+                  items.push({
+                      text: resolvedText,
+                      exKey: exKey
+                  });
+
               } else if (item.listRef) {
                   // e.g. { listRef: "speedSet" }
-                  // ctx.speedSet is array of { text: "...", exKey: "..." }
+                  // ctx.speedSet is array of { text, exKey }
                   const list = ctx[item.listRef];
                   if (Array.isArray(list)) {
                       list.forEach(li => {
-                          items.push(interpolate(li.text, ctx));
+                          items.push({
+                              text: interpolate(li.text, ctx),
+                              exKey: li.exKey
+                          });
                       });
                   }
               }

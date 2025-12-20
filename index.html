@@ -523,6 +523,82 @@
         font-size: 13px;
         color: var(--muted);
       }
+
+      /* Exercise Media & Details */
+      .exercise-details summary {
+        cursor: pointer;
+        list-style: none; /* Hide default triangle */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .exercise-details summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .exercise-details summary:hover .view-btn {
+        background: var(--border);
+        color: var(--fg);
+      }
+
+      .view-btn {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: var(--muted);
+        font-weight: 600;
+        margin-left: 8px;
+        transition: all 0.2s ease;
+      }
+
+      .exercise-details[open] .view-btn {
+        background: var(--fg);
+        color: var(--bg);
+        border-color: var(--fg);
+        content: "Hide";
+      }
+
+      .exercise-media {
+        margin-top: 12px;
+        background: var(--bg);
+        border-radius: var(--radius-sm);
+        padding: 12px;
+        border: 1px solid var(--border);
+        animation: fadeIn 0.2s ease-out;
+      }
+
+      .exercise-media img {
+        max-width: 100%;
+        border-radius: var(--radius-sm);
+        margin-bottom: 12px;
+        display: block;
+      }
+
+      .cues-list {
+        margin: 0 0 12px 0;
+        padding-left: 18px;
+      }
+
+      .cues-list li {
+        font-size: 14px;
+        margin-bottom: 4px;
+        color: var(--fg);
+      }
+
+      .exercise-note {
+        font-size: 13px;
+        font-style: italic;
+        color: var(--muted);
+        margin: 0;
+        background: var(--card);
+        padding: 8px;
+        border-radius: var(--radius-sm);
+      }
     </style>
   </head>
   <body>
@@ -705,14 +781,74 @@
       function renderBlockItems(listEl, items = []) {
         items.forEach((item) => {
           const li = document.createElement("li");
+          let text = "";
+          let exKey = null;
+
           if (typeof item === "string") {
-            li.textContent = item;
+            text = item;
           } else if (item && typeof item === "object") {
-            li.textContent = item.text || item.ref || item.listRef || "";
+            text = item.text || item.ref || item.listRef || "";
+            exKey = item.exKey;
           }
-          if (li.textContent) {
-            listEl.append(li);
+
+          if (!text) return;
+
+          // Check if we can show media
+          const exercise = (exKey && currentPlan.exercises) ? currentPlan.exercises[exKey] : null;
+
+          if (exercise) {
+              const details = document.createElement("details");
+              details.className = "exercise-details";
+
+              const summary = document.createElement("summary");
+              // Using innerHTML safely for structure
+              const spanText = document.createElement("span");
+              spanText.textContent = text;
+              // Make text bold as per requirements ("strong label")
+              spanText.style.fontWeight = "600";
+
+              const btnView = document.createElement("span");
+              btnView.className = "view-btn";
+              btnView.textContent = "View";
+
+              summary.append(spanText, btnView);
+
+              const content = document.createElement("div");
+              content.className = "exercise-media";
+
+              if (exercise.img) {
+                  const img = document.createElement("img");
+                  img.src = exercise.img;
+                  img.alt = exKey;
+                  img.loading = "lazy";
+                  content.append(img);
+              }
+
+              if (exercise.cues && exercise.cues.length) {
+                  const cuesList = document.createElement("ul");
+                  cuesList.className = "cues-list";
+                  exercise.cues.forEach(cue => {
+                      const cueLi = document.createElement("li");
+                      cueLi.textContent = cue;
+                      cuesList.append(cueLi);
+                  });
+                  content.append(cuesList);
+              }
+
+              if (exercise.note) {
+                  const note = document.createElement("p");
+                  note.className = "exercise-note";
+                  note.textContent = `💡 ${exercise.note}`;
+                  content.append(note);
+              }
+
+              details.append(summary, content);
+              li.append(details);
+          } else {
+              li.textContent = text;
           }
+
+          listEl.append(li);
         });
       }
 
@@ -999,7 +1135,24 @@
         let hasPerfectStrengthWeek = false;
         let restDaysTaken = 0;
 
-        normalizedPlan.weeks.forEach(week => {
+        // Determine which weeks to process
+        let weeksToProcess = normalizedPlan.weeks;
+
+        // Fix for Isla (Template Plan): Resolve weeks 1..Total to get actual days
+        if (currentPlan.meta.id === 'isla' && currentPlan.totalWeeks) {
+            weeksToProcess = [];
+            for (let i = 1; i <= currentPlan.totalWeeks; i++) {
+                const wId = `week-${i}`;
+                // Resolve for week i
+                const view = resolvePlanForWeek(currentPlan, i);
+                weeksToProcess.push({
+                    id: wId,
+                    days: view.days // This now has the actual blocks/items
+                });
+            }
+        }
+
+        weeksToProcess.forEach(week => {
              const progress = loadProgress(currentPlanId, week.id) || { completed: [], skipped: [] };
 
              let weekPoints = 0;
