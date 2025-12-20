@@ -598,6 +598,7 @@
     <script type="module">
       import { PLANS } from "./plans/index.js";
       import { normalizePlan } from "./plans/adapter.js";
+      import { resolvePlanForWeek } from "./plans/resolve.js";
       import { loadProgress, saveProgress } from "./progress.js";
       import { initTheme } from "./theme.js";
 
@@ -718,17 +719,35 @@
       function renderPlan() {
         if (!normalizedPlan) return;
 
-        planTitle.textContent = normalizedPlan.meta?.name || "";
-        planSubtitle.textContent = normalizedPlan.meta?.subtitle || "";
-        planSubtitle.style.display = normalizedPlan.meta?.subtitle ? "block" : "none";
-        planOverview.textContent = normalizedPlan.overview || "";
-        planOverview.style.display = normalizedPlan.overview ? "block" : "none";
+        // Dynamic Resolution for Template Plans (Isla)
+        let displayData = normalizedPlan;
+        if (currentPlan.meta.id === 'isla') {
+            const weekNum = parseInt(selectedWeekId.replace('week-', ''));
+            const view = resolvePlanForWeek(currentPlan, weekNum);
+
+            // Construct a view object compatible with the renderer
+            displayData = {
+                meta: view.meta,
+                overview: normalizedPlan.overview,
+                weeks: [{
+                    id: selectedWeekId,
+                    label: view.weekLabel,
+                    days: view.days
+                }]
+            };
+        }
+
+        planTitle.textContent = displayData.meta?.name || "";
+        planSubtitle.textContent = displayData.meta?.subtitle || "";
+        planSubtitle.style.display = displayData.meta?.subtitle ? "block" : "none";
+        planOverview.textContent = displayData.overview || "";
+        planOverview.style.display = displayData.overview ? "block" : "none";
 
         // Update Gamification
         updateGamification();
 
         weeksContainer.innerHTML = "";
-        const weeks = normalizedPlan.weeks || [];
+        const weeks = displayData.weeks || [];
         const activeWeek = weeks.find((week) => week.id === selectedWeekId) || weeks[0];
         if (!activeWeek) return;
 
@@ -917,6 +936,19 @@
         currentPlanId = planId;
         currentPlan = plan;
         normalizedPlan = normalizePlan(plan);
+
+        // Ensure weeks exist for template plans
+        if (plan.totalWeeks && (!plan.weeks || plan.weeks.length === 0)) {
+            normalizedPlan.weeks = [];
+            for (let i = 1; i <= plan.totalWeeks; i++) {
+                normalizedPlan.weeks.push({
+                    id: `week-${i}`,
+                    label: `Week ${i}`,
+                    days: [] // Content resolved in renderPlan
+                });
+            }
+        }
+
         localStorage.setItem(PLAN_KEY, planId);
         populatePicker(planId);
 
