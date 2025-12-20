@@ -172,12 +172,12 @@ export const ISLA_PLAN = {
   aerobic: {
     warmup: "Easy pace — 5 min (smooth rhythm)",
     coolDown: "Easy pace — 3–5 min",
-    steadyNote: "Pace: can talk in full sentences",
+    steadyNote: "Pace: can talk in full sentences. Stop early if form fades.",
   },
   runWalk: {
     inSeason: "Keep it very easy (no hard intervals).",
-    build: "3 min run / 2 min walk × 6–8",
-    sharpen: "4 min run / 2 min walk × 6",
+    build: "3 min run / 2 min walk × 6–8 (easy)",
+    sharpen: "4 min run / 2 min walk × 6 (conversational)",
   },
   funConditioning: {
     titleInSeason: "Pick ONE (10–25 min)",
@@ -238,6 +238,7 @@ export const ISLA_PLAN = {
           items: [
             { text: "Steady aerobic — {aerobicMain} min" },
             { text: "{aerobicSteadyNote}" },
+            { text: "Relaxed breathing. No pushing through fatigue." },
           ],
         },
         { title: "Cool-down", items: [{ text: "{aerobicCoolDown}" }] },
@@ -303,14 +304,16 @@ export const ISLA_PLAN = {
         {
           title: "Option A: Cross trainer",
           items: [
-            { text: "Easy–moderate — {crossTrainerTime} min" },
+            { text: "Easy–moderate — {crossTrainerTime} min (Max 30 min)" },
             { text: "Smooth, steady pace (relaxed breathing)" },
+            { text: "Stop early if you feel like you’re grinding." },
           ],
         },
         {
           title: "Option B: Run/Walk (only if not too many team sessions)",
           items: [
             { text: "{runWalk}" },
+            { text: "Keep it easy & conversational. Stop if form drops." },
             { text: "If anything hurts: switch to cross trainer." },
           ],
         },

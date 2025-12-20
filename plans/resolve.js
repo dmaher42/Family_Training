@@ -58,7 +58,7 @@ export function resolvePlanForWeek(plan, weekNumber, opts = {}) {
       // Or checking 'blocks' in plan to see if they are fixed.
       // They are "{aerobicMain} min".
       // I'll define a simple progression.
-      const times = { Base: 25, Build: 30, Sharpen: 35 };
+      const times = { Base: 25, Build: 30, Sharpen: 30 };
       ctx.aerobicMain = times[phaseName] || 30;
       ctx.crossTrainerTime = times[phaseName] || 30;
 
