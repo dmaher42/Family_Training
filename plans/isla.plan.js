@@ -201,7 +201,7 @@ export const ISLA_PLAN = {
         {
           title: "Warm-up (5–7 min)",
           items: [
-            { text: "March → jog in place" },
+            { text: "Skipping rope (easy)" },
             { text: "Arm swings + trunk rotations" },
             { text: "Hip circles" },
             { text: "World’s greatest stretch" },
@@ -273,7 +273,7 @@ export const ISLA_PLAN = {
         {
           title: "Warm-up",
           items: [
-            { text: "March → light jog" },
+            { text: "Skipping rope (easy)" },
             { text: "Hip hinge practice" },
           ],
         },
