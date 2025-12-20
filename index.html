@@ -704,6 +704,24 @@
       </div>
     </div>
 
+    <!-- Coach Bonus Modal -->
+    <div class="modal-backdrop" id="coachBonusModalBackdrop" role="dialog" aria-modal="true" aria-hidden="true" hidden>
+      <div class="modal" role="document" style="max-width: 400px;">
+        <div class="modal-header">
+          <h2 id="coachBonusTitle">Session Complete</h2>
+          <button id="coachBonusClose" aria-label="Close" class="btn-icon">✕</button>
+        </div>
+        <div class="modal-body">
+          <p class="muted" style="margin-top: 0; margin-bottom: 20px;">Did you stick to the plan?</p>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+             <button class="btn btn-primary" id="btnBonusSharp">Stopped while still sharp (+5)</button>
+             <button class="btn btn-primary" id="btnBonusFocus">Great focus today (+5)</button>
+             <button class="btn btn-ghost" id="btnBonusSkip">Just got it done</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <main>
       <div class="top-bar">
         <div>
@@ -755,7 +773,7 @@
         <div id="badgesContainer" class="badges-container"></div>
 
         <div class="competition-line">
-           You vs last week — can you match your focus?
+           You vs You — Quality over quantity.
         </div>
 
          <label class="toggle gamification-toggle-label">
@@ -820,6 +838,14 @@
       const exerciseModalNext = document.getElementById("exerciseModalNext");
       const exerciseModalCounter = document.getElementById("exerciseModalCounter");
       let lastFocusedElement = null;
+
+      // Coach Bonus Elements
+      const coachBonusModalBackdrop = document.getElementById("coachBonusModalBackdrop");
+      const coachBonusClose = document.getElementById("coachBonusClose");
+      const btnBonusSharp = document.getElementById("btnBonusSharp");
+      const btnBonusFocus = document.getElementById("btnBonusFocus");
+      const btnBonusSkip = document.getElementById("btnBonusSkip");
+      let pendingBonusDayId = null;
 
       let modalState = {
         exKeys: [],
@@ -989,13 +1015,52 @@
            }
       });
 
+      // --- Coach Bonus Logic ---
+      function openCoachBonusModal(dayId) {
+          pendingBonusDayId = dayId;
+          coachBonusModalBackdrop.hidden = false;
+          requestAnimationFrame(() => {
+              coachBonusModalBackdrop.setAttribute("aria-hidden", "false");
+          });
+          btnBonusSharp.focus();
+      }
+
+      function closeCoachBonusModal() {
+          coachBonusModalBackdrop.setAttribute("aria-hidden", "true");
+          setTimeout(() => {
+             if (coachBonusModalBackdrop.getAttribute("aria-hidden") === "true") {
+                coachBonusModalBackdrop.hidden = true;
+             }
+          }, 200);
+          pendingBonusDayId = null;
+      }
+
+      function applyCoachBonus(reason) {
+          if (!pendingBonusDayId) return;
+
+          // Add bonus to progress
+          const bonuses = progressState.bonuses || {};
+          bonuses[pendingBonusDayId] = { points: 5, reason };
+          progressState.bonuses = bonuses;
+
+          saveProgress(currentPlanId, selectedWeekId, progressState);
+          renderPlan(); // Update points
+
+          closeCoachBonusModal();
+      }
+
+      coachBonusClose.onclick = closeCoachBonusModal;
+      btnBonusSkip.onclick = closeCoachBonusModal;
+      btnBonusSharp.onclick = () => applyCoachBonus("sharp");
+      btnBonusFocus.onclick = () => applyCoachBonus("focus");
+
       // Coach messages
       const COACH_MESSAGES = [
-        "Strong week. Consistency beats everything.",
+        "Strong week. Quality beats quantity.",
         "Great habits building.",
         "Speed stays sharp when effort stays smart.",
         "Focus on form, the results will follow.",
-        "Showing up is the biggest win.",
+        "Better to stop early than practice bad habits.",
         "Rest is when the muscles grow.",
         "Quality reps today, better athlete tomorrow."
       ];
@@ -1282,6 +1347,9 @@
           doneBtn.setAttribute("aria-label", `Mark ${dayName} as done`);
           doneBtn.onclick = () => {
             setDayStatus(dayId, "done");
+            if (currentPlan.meta.id === 'isla') {
+                openCoachBonusModal(dayId);
+            }
           };
 
           const skipBtn = document.createElement("button");
@@ -1329,6 +1397,7 @@
         }
 
         progressState = {
+          ...progressState,
           completed: Array.from(completed),
           skipped: Array.from(skipped),
         };
@@ -1468,6 +1537,11 @@
                      }
 
                      weekDoneCount++;
+                 }
+
+                 // Add bonus points if they exist for this day
+                 if (progress.bonuses && progress.bonuses[dayId]) {
+                      weekPoints += (progress.bonuses[dayId].points || 0);
                  }
              });
 
