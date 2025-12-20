@@ -177,6 +177,140 @@
         margin: 8px 0 0 18px;
         padding: 0;
       }
+
+      /* Gamification Styles */
+      .gamification-dashboard {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+        display: none; /* Hidden by default */
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .scorecard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .scorecard-stats {
+        display: flex;
+        gap: 24px;
+      }
+
+      .stat-item {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .stat-value {
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--accent);
+      }
+
+      .stat-label {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .coach-message {
+        font-style: italic;
+        color: var(--fg);
+        margin-top: 8px;
+        font-size: 15px;
+        border-left: 3px solid var(--accent);
+        padding-left: 12px;
+        max-width: 600px;
+      }
+
+      .badges-container {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        opacity: 0.5; /* Locked state */
+        transition: all 0.3s ease;
+      }
+
+      .badge.unlocked {
+        opacity: 1;
+        border-color: var(--accent);
+        background: linear-gradient(to right, var(--bg), var(--card));
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      }
+
+      .badge-icon {
+        font-size: 16px;
+      }
+
+      .progress-section {
+        margin-top: 20px;
+      }
+
+      .progress-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      .progress-track {
+        height: 8px;
+        background: var(--bg);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--accent);
+        width: 0%;
+        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .competition-line {
+        margin-top: 12px;
+        font-size: 13px;
+        color: var(--muted);
+        text-align: center;
+        width: 100%;
+      }
+
+      .gamification-toggle-label {
+        margin-top: 12px;
+        font-size: 13px;
+        color: var(--muted);
+      }
     </style>
   </head>
   <body>
@@ -202,6 +336,44 @@
         </div>
       </div>
 
+      <!-- Gamification Dashboard -->
+      <section id="gamificationDashboard" class="gamification-dashboard">
+        <div class="scorecard-header">
+          <div class="scorecard-stats">
+            <div class="stat-item">
+              <span id="weeklyPoints" class="stat-value">0</span>
+              <span class="stat-label">This Week</span>
+            </div>
+            <div class="stat-item">
+              <span id="sessionsCompleted" class="stat-value">0/0</span>
+              <span class="stat-label">Sessions</span>
+            </div>
+          </div>
+          <div id="coachMessage" class="coach-message"></div>
+        </div>
+
+        <div class="progress-section">
+          <div class="progress-label">
+            <span>Training Blocks Completed</span>
+            <span id="totalPointsLabel">0 / 120 pts</span>
+          </div>
+          <div class="progress-track">
+            <div id="totalProgressBar" class="progress-fill"></div>
+          </div>
+        </div>
+
+        <div id="badgesContainer" class="badges-container"></div>
+
+        <div class="competition-line">
+           You vs last week — can you match your focus?
+        </div>
+
+         <label class="toggle gamification-toggle-label">
+            <input type="checkbox" id="gamificationToggle" checked />
+            <span class="muted">Show achievements</span>
+        </label>
+      </section>
+
       <section class="plan-header">
         <h2 id="planTitle" class="plan-title"></h2>
         <p id="planSubtitle" class="plan-subtitle"></p>
@@ -219,6 +391,8 @@
 
       const PLAN_KEY = "selected_plan_v1";
       const WEEK_KEY_PREFIX = "selected_week_v1";
+      const GAMIFY_TOGGLE_KEY = "isla_gamify_enabled_v1";
+      const BADGES_KEY = "badges_v1:isla";
 
       const planPicker = document.getElementById("planPicker");
       const planTitle = document.getElementById("planTitle");
@@ -228,6 +402,16 @@
       const weekPickerGroup = document.getElementById("weekPickerGroup");
       const weeksContainer = document.getElementById("weeks");
 
+      // Gamification Elements
+      const gamificationDashboard = document.getElementById("gamificationDashboard");
+      const weeklyPointsEl = document.getElementById("weeklyPoints");
+      const sessionsCompletedEl = document.getElementById("sessionsCompleted");
+      const coachMessageEl = document.getElementById("coachMessage");
+      const totalProgressBar = document.getElementById("totalProgressBar");
+      const totalPointsLabel = document.getElementById("totalPointsLabel");
+      const badgesContainer = document.getElementById("badgesContainer");
+      const gamificationToggle = document.getElementById("gamificationToggle");
+
       let currentPlanId;
       let currentPlan;
       let normalizedPlan;
@@ -235,6 +419,25 @@
       let progressState;
 
       initTheme();
+
+      // Coach messages
+      const COACH_MESSAGES = [
+        "Strong week. Consistency beats everything.",
+        "Great habits building.",
+        "Speed stays sharp when effort stays smart.",
+        "Focus on form, the results will follow.",
+        "Showing up is the biggest win.",
+        "Rest is when the muscles grow.",
+        "Quality reps today, better athlete tomorrow."
+      ];
+
+      // Badges Definition
+      const BADGES = [
+        { id: "first_week", label: "First Week Done", icon: "🟢", check: (stats) => stats.weeksCompleted >= 1 },
+        { id: "three_weeks", label: "3 Weeks Consistent", icon: "🔵", check: (stats) => stats.weeksCompleted >= 3 },
+        { id: "strength_master", label: "All Strength Days", icon: "🟣", check: (stats) => stats.strengthDays >= 12 }, // e.g. 1 per week
+        { id: "recovery_pro", label: "Recovery Matters", icon: "🟡", check: (stats) => stats.restDaysTaken >= 1 }
+      ];
 
       function getDefaultPlanId() {
         const ids = Object.keys(PLANS);
@@ -308,6 +511,9 @@
         planSubtitle.style.display = normalizedPlan.meta?.subtitle ? "block" : "none";
         planOverview.textContent = normalizedPlan.overview || "";
         planOverview.style.display = normalizedPlan.overview ? "block" : "none";
+
+        // Update Gamification
+        updateGamification();
 
         weeksContainer.innerHTML = "";
         const weeks = normalizedPlan.weeks || [];
@@ -478,6 +684,164 @@
         setActiveWeek(selectedWeekId || defaultWeek);
       }
 
+      // --- Gamification Logic ---
+
+      function updateGamification() {
+        const isIsla = currentPlanId === "isla";
+        const storedToggle = localStorage.getItem(GAMIFY_TOGGLE_KEY);
+        const isEnabled = storedToggle !== "false"; // Default true
+
+        // Update toggle UI state
+        gamificationToggle.checked = isEnabled;
+
+        if (!isIsla || !isEnabled) {
+            gamificationDashboard.style.display = "none";
+            return;
+        }
+
+        gamificationDashboard.style.display = "block";
+
+        // Calculate Stats
+        const stats = calculateStats();
+
+        // Render Dashboard
+        renderDashboard(stats);
+      }
+
+      function calculateStats() {
+        if (!normalizedPlan) return {};
+
+        let totalPoints = 0;
+        let weeklyPoints = 0;
+        let weekSessionsDone = 0;
+        let weekSessionsTotal = 0;
+        let weeksCompleted = 0;
+        let strengthDays = 0;
+        let restDaysTaken = 0;
+
+        normalizedPlan.weeks.forEach(week => {
+             const progress = loadProgress(currentPlanId, week.id) || { completed: [], skipped: [] };
+
+             let weekPoints = 0;
+             let weekDoneCount = 0;
+             let weekPlanCount = week.days.length;
+             let weekStrengthCount = 0;
+
+             week.days.forEach((day, idx) => {
+                 // Identify Rest Day
+                 const isRest = day.focus === "Rest";
+                 const dayId = day.id || day.day || day.name || `day-${idx + 1}`;
+                 const isDone = progress.completed.includes(dayId);
+
+                 if (isDone) {
+                     if (isRest) {
+                         weekPoints += 5;
+                         restDaysTaken++;
+                     } else {
+                         weekPoints += 10;
+                         weekStrengthCount++;
+                         // Note: Simply counting non-rest days as strength/effort for simplicity
+                         // unless specific "focus" check is needed.
+                         // Prompt says: "All Strength Days Completed" - let's check focus "Strength"
+                         if (day.focus && day.focus.includes("Strength")) {
+                             strengthDays++;
+                         }
+                     }
+                     weekDoneCount++;
+                 }
+             });
+
+             totalPoints += weekPoints;
+
+             // If this is the currently selected week, update weekly stats
+             if (week.id === selectedWeekId) {
+                 weeklyPoints = weekPoints;
+                 weekSessionsDone = weekDoneCount;
+                 weekSessionsTotal = weekPlanCount;
+             }
+
+             // Heuristic for "Week Completed": > 70% days done? Or just non-zero points?
+             // Prompt: "First Week Done".
+             // Let's assume > 30 points (approx 3 days) counts as a "completed week" contextually for badges.
+             if (weekPoints >= 30) {
+                 weeksCompleted++;
+             }
+        });
+
+        return {
+            totalPoints,
+            weeklyPoints,
+            weekSessionsDone,
+            weekSessionsTotal,
+            weeksCompleted,
+            strengthDays,
+            restDaysTaken
+        };
+      }
+
+      function renderDashboard(stats) {
+          // Weekly Scorecard
+          weeklyPointsEl.textContent = stats.weeklyPoints;
+          sessionsCompletedEl.textContent = `${stats.weekSessionsDone}/${stats.weekSessionsTotal}`;
+
+          // Coach Message (random but deterministic per day/week? Random is fine for now)
+          if (!coachMessageEl.textContent || Math.random() > 0.8) {
+             const msg = COACH_MESSAGES[Math.floor(Math.random() * COACH_MESSAGES.length)];
+             coachMessageEl.textContent = `“${msg}”`;
+          }
+
+          // Progress Bar
+          // Goal: 120 points = 12 weeks * 10 points/week??
+          // Wait, 12 weeks * 10 points is very low.
+          // Prompt says: "Goal: e.g. 120 points = 12 solid weeks".
+          // Actually 10 points is 1 session.
+          // If Isla does 4 sessions/week = 40 pts.
+          // 12 weeks * 40 pts = 480 pts.
+          // Maybe the prompt meant "120 points" as an arbitrary example.
+          // Let's set the goal to 500 (approx 12 weeks * 40pts).
+          const GOAL_POINTS = 500;
+          const percentage = Math.min((stats.totalPoints / GOAL_POINTS) * 100, 100);
+          totalProgressBar.style.width = `${percentage}%`;
+          totalPointsLabel.textContent = `${stats.totalPoints} / ${GOAL_POINTS} pts`;
+
+          // Badges
+          renderBadges(stats);
+      }
+
+      function renderBadges(stats) {
+          badgesContainer.innerHTML = "";
+
+          // Retrieve stored badges
+          const storedBadges = JSON.parse(localStorage.getItem(BADGES_KEY) || "[]");
+          const newUnlocked = [];
+
+          BADGES.forEach(badge => {
+              const isUnlocked = storedBadges.includes(badge.id) || badge.check(stats);
+
+              if (isUnlocked && !storedBadges.includes(badge.id)) {
+                  newUnlocked.push(badge.id);
+              }
+
+              const badgeEl = document.createElement("div");
+              badgeEl.className = `badge ${isUnlocked ? "unlocked" : ""}`;
+              badgeEl.innerHTML = `<span class="badge-icon">${badge.icon}</span> ${badge.label}`;
+              badgesContainer.append(badgeEl);
+          });
+
+          // Save new unlocks
+          if (newUnlocked.length > 0) {
+              const updated = [...storedBadges, ...newUnlocked];
+              localStorage.setItem(BADGES_KEY, JSON.stringify(updated));
+          }
+      }
+
+      // Toggle Event Listener
+      gamificationToggle.addEventListener("change", (e) => {
+          localStorage.setItem(GAMIFY_TOGGLE_KEY, e.target.checked);
+          updateGamification();
+      });
+
+      // Initial
       const startingPlanId = getDefaultPlanId();
       setActivePlan(startingPlanId);
 
