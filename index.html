@@ -459,7 +459,7 @@
         border-top: 1px solid var(--border);
       }
 
-      .badge {
+      .gamification-dashboard .achievement-badge {
         display: inline-flex;
         align-items: center;
         gap: 6px;
@@ -473,14 +473,14 @@
         transition: all 0.3s ease;
       }
 
-      .badge.unlocked {
+      .gamification-dashboard .achievement-badge.unlocked {
         opacity: 1;
         border-color: var(--accent);
         background: linear-gradient(to right, var(--bg), var(--card));
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
       }
 
-      .badge-icon {
+      .gamification-dashboard .achievement-badge-icon {
         font-size: 16px;
       }
 
@@ -1450,8 +1450,8 @@
               }
 
               const badgeEl = document.createElement("div");
-              badgeEl.className = `badge ${isUnlocked ? "unlocked" : ""}`;
-              badgeEl.innerHTML = `<span class="badge-icon">${badge.icon}</span> ${badge.label}`;
+              badgeEl.className = `achievement-badge ${isUnlocked ? "unlocked" : ""}`;
+              badgeEl.innerHTML = `<span class="achievement-badge-icon">${badge.icon}</span> ${badge.label}`;
               badgesContainer.append(badgeEl);
           });
 
