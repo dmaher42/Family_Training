@@ -170,7 +170,7 @@ export const ISLA_PLAN = {
     ],
   },
   aerobic: {
-    warmup: "Easy pace — 5 min",
+    warmup: "Easy pace — 5 min (smooth rhythm)",
     coolDown: "Easy pace — 3–5 min",
     steadyNote: "Pace: can talk in full sentences",
   },
@@ -201,10 +201,10 @@ export const ISLA_PLAN = {
         {
           title: "Warm-up (5–7 min)",
           items: [
-            { text: "Skipping rope (easy)" },
-            { text: "Arm swings + trunk rotations" },
-            { text: "Hip circles" },
-            { text: "World’s greatest stretch" },
+            { text: "Skipping rope (light, quiet feet)" },
+            { text: "Arm swings (tall posture)" },
+            { text: "Hip hinge patterning (slow + controlled)" },
+            { text: "World’s greatest stretch (active reach)" },
           ],
         },
         {
@@ -250,9 +250,10 @@ export const ISLA_PLAN = {
         {
           title: "Warm-up (5–7 min)",
           items: [
-            { text: "Easy jog or march" },
-            { text: "Leg swings" },
-            { text: "2 short relaxed accelerations" },
+            { text: "Easy jog (tall + rhythmic)" },
+            { text: "Leg swings (controlled range)" },
+            { text: "Posture check (tall, balls of feet)" },
+            { text: "2 short relaxed accelerations (smooth build)" },
           ],
         },
         {
@@ -273,8 +274,10 @@ export const ISLA_PLAN = {
         {
           title: "Warm-up",
           items: [
-            { text: "Skipping rope (easy)" },
-            { text: "Hip hinge practice" },
+            { text: "Skipping rope (easy rhythm)" },
+            { text: "Hip hinge practice (flat back, feel hamstrings)" },
+            { text: "Single-leg balance (grip floor with toes)" },
+            { text: "Bear crawl hold (knees hover, solid back)" },
           ],
         },
         {
@@ -299,7 +302,7 @@ export const ISLA_PLAN = {
           title: "Option A: Cross trainer",
           items: [
             { text: "Easy–moderate — {crossTrainerTime} min" },
-            { text: "Smooth, steady pace" },
+            { text: "Smooth, steady pace (relaxed breathing)" },
           ],
         },
         {
