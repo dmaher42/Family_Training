@@ -123,19 +123,19 @@ export const ISLA_PLAN = {
     ],
     speedSets: [
       [
-        { text: "A-Skips — {reps}×20m", exKey: "A-Skips" },
-        { text: "Side Shuffle — {reps}×15m", exKey: "Side Shuffle" },
-        { text: "Backpedal + Sprint — {reps} reps", exKey: "Backpedal + Sprint" },
+        { text: "A-Skips — 3×20m (tall + crisp)", exKey: "A-Skips" },
+        { text: "Side Shuffle — 3×15m (stay low)", exKey: "Side Shuffle" },
+        { text: "Backpedal + Sprint — 3–4 reps (sharp turn)", exKey: "Backpedal + Sprint" },
       ],
       [
-        { text: "A-Skips — {reps}×20m", exKey: "A-Skips" },
-        { text: "Side Shuffle — {reps}×15m", exKey: "Side Shuffle" },
-        { text: "Acceleration (10–15m) — {reps} reps", exKey: "" },
+        { text: "A-Skips — 3×20m (relaxed shoulders)", exKey: "A-Skips" },
+        { text: "Side Shuffle — 3×15m", exKey: "Side Shuffle" },
+        { text: "Acceleration (10–15m) — 3–4 reps (smooth projection)", exKey: "" },
       ],
       [
-        { text: "Fast feet (5 sec) + relax — {reps} reps", exKey: "" },
-        { text: "Side Shuffle — {reps}×15m", exKey: "Side Shuffle" },
-        { text: "Backpedal + Sprint — {reps} reps", exKey: "Backpedal + Sprint" },
+        { text: "Fast feet (5 sec) + relax — 3 reps (crisp)", exKey: "" },
+        { text: "Side Shuffle — 3×15m", exKey: "Side Shuffle" },
+        { text: "Backpedal + Sprint — 3–4 reps", exKey: "Backpedal + Sprint" },
       ],
     ],
     hinge: [
@@ -258,13 +258,13 @@ export const ISLA_PLAN = {
           ],
         },
         {
-          title: "Skills (quality reps)",
+          title: "Skills (Quality > Quantity)",
           items: [
             { listRef: "speedSet" },
-            { text: "Reaction game (clap/call) — 4–6 reps" },
+            { text: "Reaction game (clap/call) — 3–4 reps" },
           ],
         },
-        { title: "Rule", items: [{ text: "Stop while she still looks fast" }] },
+        { title: "Rule", items: [{ text: "Stop immediately if posture or speed drops" }] },
       ],
     },
     day4: {
