@@ -336,6 +336,7 @@
       /* Modal Styles */
       .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 7, 35, 0.35); backdrop-filter: blur(6px); display: grid; place-items: center; z-index: 999; padding: 18px; transition: opacity 0.2s ease; }
       .modal { background: var(--card); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--border); max-width: 560px; width: 100%; max-height: 90vh; overflow: hidden; }
+      .modal-backdrop[aria-hidden="true"] { display: none; }
 
       .modal-body { padding: 18px 20px 8px; overflow-y: auto; max-height: 60vh; }
       .modal-header { padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: linear-gradient(120deg, rgba(92, 124, 255, 0.06), transparent); }
@@ -776,7 +777,10 @@
       }
 
       function applyCoachBonus(reason) {
-          if (!pendingBonusDayId) return;
+          if (!pendingBonusDayId) {
+            closeCoachBonusModal();
+            return;
+          }
 
           // Add bonus to progress
           const bonuses = progressState.bonuses || {};
@@ -793,6 +797,19 @@
       btnBonusSkip.onclick = closeCoachBonusModal;
       btnBonusSharp.onclick = () => applyCoachBonus("sharp");
       btnBonusFocus.onclick = () => applyCoachBonus("focus");
+      coachBonusModalBackdrop.addEventListener("click", (e) => {
+          if (e.target === coachBonusModalBackdrop) {
+              closeCoachBonusModal();
+          }
+      });
+      document.addEventListener("keydown", (e) => {
+          const isOpen = coachBonusModalBackdrop.getAttribute("aria-hidden") === "false";
+          if (!isOpen) return;
+
+          if (e.key === "Escape") {
+              closeCoachBonusModal();
+          }
+      });
 
       // Coach messages
       const COACH_MESSAGES = [
