@@ -61,20 +61,21 @@ export const WIFE_PLAN = {
   },
   cardio: {
     steady: {
-      headline: "Brisk walk / treadmill walk / marching: {{minutes}} minutes",
-      effort: "Effort: “can talk, can’t sing”"
+      headline: "Zone 2 Treadmill Walk / Low-Impact Aerobic: {{minutes}} minutes",
+      effort: "Pace: can talk in full sentences (easy-moderate). Optional: slightly elevated breathing. If feeling good, add a small incline OR slightly faster pace next week."
     },
     intervals: {
       rounds: { Base: 6, Build: 7, Shape: 8 },
       pattern: [
         "Repeat {{rounds}} rounds:",
-        "1 min faster walk/march + 2 min easy",
-        "No running. Keep it joint-friendly."
+        "1 min brisk walk (Zone 2 upper end) + 2 min easy",
+        "Pace: can talk in full sentences. No running. Keep it joint-friendly.",
+        "If feeling good, add a small incline OR slightly faster pace next week."
       ]
     },
     light: {
-      headline: "Easy walk / easy march: {{minutes}} minutes",
-      effort: "Keep it comfortable (recovery pace)"
+      headline: "Zone 2 Treadmill Walk / Low-Impact Aerobic: {{minutes}} minutes",
+      effort: "Pace: can talk in full sentences. Keep it very comfortable. If feeling good, add a small incline OR slightly faster pace next week."
     }
   },
   days: [
